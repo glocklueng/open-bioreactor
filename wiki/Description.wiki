@@ -2,7 +2,18 @@ A cost effective bioreactor that can be monitored and controlled by a web interf
 
 = Introduction =
 
-Add your content here.
+This project aims at using an Arduino board to monitor and control a bioreactor from a web interface. A first prototype was build at the Universidad del Valle, Cali, Colombia as an attempt to produce a cost effective and easily maintainable alternative to usually very expensive genuine bioreactors. The setup encompasses a home made bioreactor, an Arduino Mega 2560 board for control and monitoring, an embedded Alix computer as a server and a router. 
+
+The features of the reactors are as follows:
+
+  * pH monitoring
+  * pH control using pinch valves (to be added soon)
+  * NH4+ monitoring (to be added soon)
+  * temperature monitoring and regulation (3 point measurement and heating regulation)
+  * regulation of the motor used for agitation
+  * liquid level monitoring
+  * semi-batch operation using two peristaltic pumps
+  * gas inlet control for 3 different gases.
 
 
 = Details =
