@@ -16,9 +16,5 @@ The features of the reactors are as follows:
   * gas inlet control for 3 different gases.
 
 
-= Details =
+= Technical Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
