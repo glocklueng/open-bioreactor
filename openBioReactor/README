@@ -5,10 +5,10 @@ The 'libraries' have to be in the root directory of the Arduino IDE
 
 *-----------------------------------------------------------------*
 
-The files in 'Bioreactor_ino' is only compatible with "Arduino-1.0-beta1".
+The files in 'Bioreactor_ino' is only compatible with "Arduino-1.0-RC1".
 
-If you're using the beta version of the Arduino IDE "Arduino-1.0-beta1", you have to use the 'libraries_ino' (some libraries had to be modified slightly) as well as the modified core libraries 'cores_arduino_ino' of the Arduino IDE ("Arduino IDE root"/hardware/arduino/cores/arduino/).
+If you're using the release candidate of Arduino IDE "Arduino-1.0-RC1", you have to use the 'libraries_ino' (some libraries had to be modified slightly).
 
-NOTE: the project is still being ported to the new Arduino beta IDE. The goal is that no core libraries have to be modified. In the meantime, we can use this small workaround.
+NOTE: The project is till being ported to the new Arduino IDE.
 
 *-----------------------------------------------------------------*

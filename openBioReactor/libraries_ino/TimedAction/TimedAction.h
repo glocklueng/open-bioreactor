@@ -30,7 +30,11 @@
 #ifndef TIMEDACTION_H
 #define TIMEDACTION_H
 
-#include "wiring.h"
+#if defined(ARDUINO) && ARDUINO >= 100
+  #include "Arduino.h"
+#else
+  #include "WProgram.h"
+#endif
 
 #define NO_PREDELAY 0
 
