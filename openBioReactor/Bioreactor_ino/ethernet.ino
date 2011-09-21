@@ -57,12 +57,12 @@ byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packe
 unsigned long epoch; // Unix time (starts on Jan 1 1970)
 
 // A UDP instance to let us send and receive packets over UDP
-UDP Udp;
+EthernetUDP Udp;
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
-Client client;
+EthernetClient client;
 
 //WORKAROUND: reserve space for the JSON String (MAX_COMMAND_STRING_LENGTH = 400 bytes);
 //because there are some errors in the current used library of the "String" in the Arduino IDE 0022

@@ -199,7 +199,12 @@ void liquidLevelUpdate()
 //    Serial.println(liquidPercentFull); 
   }
   
-
+ // if the motor is on, the pression on the liquid level sensor increases
+ // thus, the level 'raises' linearly; therefore adjust this error
+  if(relaySwitchMotorGetState())
+  {
+    liquidHeightGlobal += 0.75;
+  }
   liquidHeightInterval = liquidLevelAtPin;
   liquidHeightVolume = 0.85*liquidHeightGlobal;
 
