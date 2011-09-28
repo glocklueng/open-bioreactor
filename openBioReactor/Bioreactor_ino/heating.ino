@@ -83,6 +83,24 @@ void heatingRetulatePIDControl()
     digitalWrite(PIN_HEATING_RESISTANCE,LOW);
     //if(DEBUG) Serial.print("Heating is OFF!\n");      
   }
+ 
+  // security algorithm: if the temperature of the bottom plate is higher than HEATING_MAX_ALLOWED_LIMIT degrees; 
+  // turn heating of and put bioreactor in STAND BY state
+  // if the measured temperature is lower than TEMPERATURE_MIN_ALLOWED_LIMIT, that means sensor is working WRONG! 
+  if(temperatureMeasuredBottomPlate() >= HEATING_MAX_ALLOWED_LIMIT
+     || temperatureMeasuredInLiquid() >= HEATING_MAX_ALLOWED_LIMIT
+     || temperatureMeasuredInLiquid() <= TEMPERATURE_MIN_ALLOWED_LIMIT
+     || temperatureMeasuredBottomPlate() <= TEMPERATURE_MIN_ALLOWED_LIMIT
+     || temperatureMeasuredAmbient() <= TEMPERATURE_MIN_ALLOWED_LIMIT
+    )
+  {
+    //override all important internal heating commands!
+    digitalWrite(PIN_HEATING_RESISTANCE,LOW);
+    heatingRegInput = 0;
+    heatingRegSetpoint = 0;
+    BIOREACTOR_MODE = BIOREACTOR_ERROR_MODE;
+    Serial.println("WARNING: The maximum temperature has been exceeded! The bioreactor has been forced to standby mode!");
+  } 
    
 }
 

@@ -1,14 +1,16 @@
-*-----------------------------------------------------------------*
-The files in 'Bioreactor_pde' is only compatible with "Arduino 0022"
+*----------------------------------------------------------------------------*
+The files in 'Bioreactor_pde' are only compatible with "Arduino IDE 0022"
 
-The 'libraries' have to be in the root directory of the Arduino IDE
+*----------------------------------------------------------------------------*
+The files in 'Bioreactor' are only compatible with "Arduino-1.0-RC1 IDE".
 
-*-----------------------------------------------------------------*
 
-The files in 'Bioreactor_ino' is only compatible with "Arduino-1.0-RC1".
+*----------------------------------------------------------------------------*
 
-If you're using the release candidate of Arduino IDE "Arduino-1.0-RC1", you have to use the 'libraries_ino' (some libraries had to be modified slightly).
+The additional libraries have to be added into the ../libraries/ directory 
+of the Arduino IDE. They should be compatible with the both versions, but have
+only be tested and are modified to be compatible with the Arduino-1.0-RC1 IDE.
 
-NOTE: The project is till being ported to the new Arduino IDE.
-
-*-----------------------------------------------------------------*
+These libraries are the same that can be found on arduino.cc, but the
+includes had to be slightly modified in order to be compatible with the new
+Arduino IDE.
