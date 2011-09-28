@@ -1,5 +1,5 @@
 *----------------------------------------------------------------------------*
-The files in 'Bioreactor_pde' are only compatible with "Arduino IDE 0022"
+The files in 'Bioreactor_0022' are only compatible with "Arduino IDE 0022"
 
 *----------------------------------------------------------------------------*
 The files in 'Bioreactor' are only compatible with "Arduino-1.0-RC1 IDE".
