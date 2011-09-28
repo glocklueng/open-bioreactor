@@ -1,7 +1,9 @@
 void ethernetSetup();
-void ethernetUpdateNTPTime();
+void ethernetSyncNTPTime();
 unsigned long ethernetSendNTPpacket(byte *address);
+void ethernetUpdateNTPTimeStamp();
 unsigned long ethernetGetTimeStamp();
+char * ethernetGetTimeStampChar();
 void ethernetPushLog(String logString);
 void ethernetGetCommand();
 
@@ -43,18 +45,22 @@ void ethernetGetCommand();
 
 // Enter a MAC address and IP address for the Arduino controller below.
 // The IP address is reserved on the routher for this Arduino controller.
-byte mac[] = {
-  0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-byte ip[] = {
-  10,0,0,28};
+byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+byte ip[] = {10,0,0,3}; // reserved IP adress of the Arduino
+
 
 
 // Parameters for the NTP clock
 unsigned int localPort = 8888;      // local port to listen for UDP packets
-IPAddress server(10,0,0,29); // local NTP server 
+IPAddress server(10,0,0,2); // local NTP server 
 const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
 byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets 
-unsigned long epoch; // Unix time (starts on Jan 1 1970)
+unsigned long epoch = 0; // Unix time (starts on Jan 1 1970)
+unsigned long epochTimeStampDiff = 0;
+
+char timeStampCharBuffer[35]; // for the convertion of unsigned long into char of 'epoch'
+char *pointerToTimeStampCharBuffer;
+
 
 // A UDP instance to let us send and receive packets over UDP
 EthernetUDP Udp;
@@ -85,20 +91,16 @@ void ethernetSetup()
 }
 
 
-void ethernetUpdateNTPTime()
+void ethernetSyncNTPTime()
 {
+  epochTimeStampDiff = millis();
+  
   digitalWrite(PIN_SD_CARD,HIGH); // Disable SD card first (NEVER FORGET THIS!)
   unsigned long duration = millis();
   ethernetSendNTPpacket(server); // send an NTP packet to a time server
-  // wait to see if a reply is available
-  int i = 0;
-  while(!Udp.parsePacket() && i<100)
-  {
-    i++;
-    delay(1); 
-  }  
+  
   if ( Udp.parsePacket() ) 
-  {  
+  { 	    
    // We've received a packet, read the data from it
     Udp.read(packetBuffer,NTP_PACKET_SIZE);  // read the packet into the buffer
 
@@ -153,6 +155,8 @@ void ethernetUpdateNTPTime()
     }
 
   }
+
+   if(DEBUG)Serial.println("Time stamp updated.");
 }
 
 
@@ -176,17 +180,80 @@ unsigned long ethernetSendNTPpacket(IPAddress& address)
 
   // all NTP fields have been given values, now
   // you can send a packet requesting a timestamp:
-  if(DEBUG)Serial.println("Requesting NTP timestamp from server."); 	   
+  if(DEBUG)Serial.print("Requesting NTP timestamp from server: "); 	   
+  if(DEBUG)Serial.println(address); 	   
   Udp.beginPacket(address, 123); //NTP requests are to port 123
   Udp.write(packetBuffer,NTP_PACKET_SIZE);
   Udp.endPacket(); 
+  
+  
+  if(DEBUG)Serial.println("NTP timestamp sent to server."); 	   
 }
+
+void ethernetUpdateNTPTimeStamp()
+{
+  //this function is done for the case the NTP server is unreachable
+
+  //check if there is an overflow of the millis()  
+  unsigned long now = millis();
+  if(now < epochTimeStampDiff)
+  {
+    epochTimeStampDiff = millis();
+    ethernetSyncNTPTime();
+    return;
+   // else: other solution: timer0_overflow_count = 0; // set timer0 that is used by millis to 0
+  }
+  
+  epoch += (now-epochTimeStampDiff)/1000; // because epoch is in seconds and now in milliseconds
+  epochTimeStampDiff = now; 
+  if(DEBUG)
+  {
+      Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
+      Serial.print((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
+      Serial.print(':');  
+      
+      if ( ((epoch % 3600) / 60) < 10 ) 
+      {
+      // In the first 10 minutes of each hour, we'll want a leading '0'
+      Serial.print('0');
+      }
+      Serial.print((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
+      Serial.print(':'); 
+      if ( (epoch % 60) < 10 ) 
+      {
+      // In the first 10 seconds of each minute, we'll want a leading '0'
+      Serial.print('0');
+      }
+      Serial.println(epoch %60); // print the second
+ 
+  } 
+  
+}
+
+
 
 unsigned long ethernetGetTimeStamp()
 {
+  //first update the time stamp then return the new value
+  ethernetUpdateNTPTimeStamp();
   return epoch; 
 }
 
+char * ethernetGetTimeStampChar()
+{
+  //first update the time stamp then return the new value
+  ethernetUpdateNTPTimeStamp();
+  
+  
+   pointerToTimeStampCharBuffer = ultoa(epoch, timeStampCharBuffer, 10);
+   if(DEBUG)
+   {
+     Serial.print("The converted epoch time (to char) is: ");
+     Serial.println(pointerToTimeStampCharBuffer);
+   }
+  return pointerToTimeStampCharBuffer;
+  
+}
 
 void ethernetPushLog(String logString)
 {
@@ -215,15 +282,13 @@ void ethernetPushLog(String logString)
       dataStringLength += 50; // reserve space for aditional characters of the URL string
       char pushUrl[dataStringLength];
       logString.toCharArray(bufferUrl,sizeof(bufferUrl));
-          Serial.print(sizeof(bufferUrl));
-        Serial.println(bufferUrl);
         
       strcpy(pushUrl,"GET /bioReacTor/add.php?");
       strcat(pushUrl,bufferUrl);
       strcat(pushUrl," HTTP/1.0\n\n");
     
-              Serial.print(sizeof(pushUrl));
-        Serial.println(pushUrl);
+        if(DEBUG)Serial.print(sizeof(pushUrl));
+        if(DEBUG)Serial.println(pushUrl);
         client.println(pushUrl);
 
     if(DEBUG)Serial.print("The log has been pushed to the server.");
@@ -293,7 +358,7 @@ void ethernetGetCommand()
   if(DEBUG)Serial.println("Disconnected from getting commands.");
   
 
-  if(DEBUG)Serial.print("The json command string length is: [] ");
+  if(DEBUG)Serial.print("The json command string length is [characters]: ");
 if(DEBUG)Serial.print(jsonCommand.length());
   if(DEBUG)Serial.println(" and the string is: ");
 if(DEBUG)Serial.println(jsonCommand);
@@ -333,11 +398,11 @@ if(DEBUG)Serial.println(jsonCommand);
       if(HEATING_TEMPERATURE_LIMIT >= extractedValueFloat + 0.05 || HEATING_TEMPERATURE_LIMIT <= extractedValueFloat-0.05)
       {
         // check if the input value is valid, then safe it
-        if(extractedValueFloat > HEAGINT_MAX_ALLOWED_LIMIT)
+        if(extractedValueFloat > HEATING_MAX_ALLOWED_LIMIT)
         {
           if(DEBUG)Serial.println("WARNING: The input temperature is to high! New temperature value has not been set.");
         }
-        else if (extractedValueFloat < HEAGINT_MIN_ALLOWED_LIMIT)
+        else if (extractedValueFloat < HEATING_MIN_ALLOWED_LIMIT)
         {
           if(DEBUG)Serial.println("WARNING: The input temperature is to low! New temperature value has not been set.");
         }
@@ -348,7 +413,7 @@ if(DEBUG)Serial.println(jsonCommand);
           if(DEBUG)Serial.println(HEATING_TEMPERATURE_LIMIT);
         }
       }
-      else if(DEBUG)Serial.println("The set temperature is the same as the saved one (error: 0.05).");
+      else if(DEBUG)Serial.println("The set temperature is the same as the saved one (deviation <0.05).");
 
 
 
@@ -398,11 +463,11 @@ if(DEBUG)Serial.println(jsonCommand);
         else
         {
           LIQUID_LEVEL_SET = extractedValueFloat;
-          if(DEBUG)Serial.print("The new liquid level has been successfully set to: [inch]");
+          if(DEBUG)Serial.print("The new liquid level has been successfully set to [inch]: ");
           if(DEBUG)Serial.println(LIQUID_LEVEL_SET);
         }
       }
-      else if(DEBUG)Serial.println("The set liquid level is the same as the saved one (error: 0.05).");
+      else if(DEBUG)Serial.println("The set liquid level is the same as the saved one (deviation <0.05).");
 
 
 //
@@ -457,7 +522,7 @@ if(DEBUG)Serial.println(jsonCommand);
           if(DEBUG)Serial.println(pH_SET);
         }
       }
-      else if(DEBUG)Serial.println("The set temperature is the same as the saved one (error: 0.05).");
+      else if(DEBUG)Serial.println("The set temperature is the same as the saved one (deviation <0.05).");
 
 
 
@@ -515,18 +580,18 @@ if(DEBUG)Serial.println(jsonCommand);
       }
       else if(DEBUG)Serial.println("The Bioreactor state is the same as the saved one.");
 
-      if(DEBUG)Serial.print("The indexes are: ");
-      if(DEBUG)Serial.print(indexBufferStart);
-      if(DEBUG)Serial.print(" and ");
-      if(DEBUG)Serial.println(indexBufferEnd);  
-      if(DEBUG)Serial.print("The extractedValue length is: ");
-      if(DEBUG)Serial.println(extractedValue.length());   
-      if(DEBUG)Serial.print("The extracted string is: ");
-      if(DEBUG)Serial.println(extractedValue);    
-      if(DEBUG)Serial.print("The extracted char is: ");
-      if(DEBUG)Serial.println(extractedValueChar);
-      if(DEBUG)Serial.print("The extracted int is: ");
-      if(DEBUG)Serial.println(extractedValueInt);
+//      if(DEBUG)Serial.print("The indexes are: ");
+//      if(DEBUG)Serial.print(indexBufferStart);
+//      if(DEBUG)Serial.print(" and ");
+//      if(DEBUG)Serial.println(indexBufferEnd);  
+//      if(DEBUG)Serial.print("The extractedValue length is: ");
+//      if(DEBUG)Serial.println(extractedValue.length());   
+//      if(DEBUG)Serial.print("The extracted string is: ");
+//      if(DEBUG)Serial.println(extractedValue);    
+//      if(DEBUG)Serial.print("The extracted char is: ");
+//      if(DEBUG)Serial.println(extractedValueChar);
+//      if(DEBUG)Serial.print("The extracted int is: ");
+//      if(DEBUG)Serial.println(extractedValueInt);
 
     }
     else Serial.println("ERROR: The term 'mode:' couldn't have been found in the JSON command string. Please verify the command string.");

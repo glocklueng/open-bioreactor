@@ -1,11 +1,15 @@
-#include <SD.h>
-//#include <OneWire.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+//#include <SD.h>
+#include <OneWire.h>
 #include <PID_v1.h>
 #include <TimedAction.h>
 
 #include <SPI.h> // needed for Ethernet library
 #include <Ethernet.h>
-#include <Udp.h> // in the libraries/Ethernet folder
+#include <EthernetUdp.h> // in the libraries/Ethernet folder
+
 
 
 
@@ -19,14 +23,15 @@
 #define BIOREACTOR_STANDBY_MODE 1
 #define BIOREACTOR_RUNNING_MODE 2
 #define BIOREACTOR_PUMPING_MODE 3
+#define BIOREACTOR_ERROR_MODE 99
 
 //----------CONSTANTS-HEATING---------
 #define PIN_HEATING_RESISTANCE 28//or 7 if on PWM
 //for the regulation of temperature values btw 10 and 45 [s] are commun
 #define HEATING_REGULATION_TIME_WINDOWS 5000 //in [ms] 
-#define HEAGINT_MAX_ALLOWED_LIMIT 40.0f // MIN and MAX allowed input values to set the temperature over webUI 
+#define HEATING_MAX_ALLOWED_LIMIT 40.0f // MIN and MAX allowed input values to set the temperature over webUI 
 // f at the end means float value 
-#define HEAGINT_MIN_ALLOWED_LIMIT 20.0f // usually below the ambient temperature of the lab
+#define HEATING_MIN_ALLOWED_LIMIT 20.0f // usually below the ambient temperature of the lab
 
 //----------CONSTANTS-LIQUID-LEVEL---------
 #define PIN_LIQUID_LEVEL A5
@@ -56,12 +61,13 @@
 #define PIN_TEMPERATURE_SENSOR_BOTTOM 33 // most closly to the external power supply of the extension board
 #define PIN_TEMPERATURE_SENSOR_IN_LIQUID 32 
 #define PIN_TEMPERATURE_SENSOR_AMBIENT 31
+#define TEMPERATURE_MIN_ALLOWED_LIMIT 15 // 15°C is the lowest allowed measured voltage; this Bioreactor is made for Cali, Colombia
 //#define LOG_TEMPERATURE_LENGTH 512// in bytes
 
-TimedAction timerUpdateSensors = TimedAction(5000,globalUpdateSensors); // value is in milisec
-TimedAction timerPumpingOut = TimedAction(30000,relaySwitchPumpOutTurnOn); //wait 10min before pumping out
-TimedAction timerGetCommandPushLog = TimedAction(2000,globalGetCommandAndPushLog);
-
+TimedAction timerUpdateSensors = TimedAction(10000,globalUpdateSensors); // value is in milisec
+TimedAction timerPumpingOut = TimedAction(600000,relaySwitchPumpOutTurnOn); //wait 10min=600'000milisec before pumping out
+TimedAction timerGetCommandPushLog = TimedAction(7000,globalGetCommandAndPushLog);
+TimedAction timerSyncNTP = TimedAction(3600000,ethernetSyncNTPTime); // sync NTP time from server every hour
 
 //global variables used by functions and are set by WebUI
 boolean DEBUG = true;
@@ -84,20 +90,22 @@ void setup()
   pinMode(PIN_SD_CARD, OUTPUT); //pin 4 is for the SD card 
   pinMode(PIN_ETHERNET, OUTPUT); //and pin 10 for the Ethernet chip    
 
-  //temperatureSetup();
+  temperatureSetup();
   heatingSetup();
   relaySwitchSetup();
   gasValvesSetup();
-  //loggingSetup();
+  loggingSetup();
   ethernetSetup();
-  sdCardSetup();
+  //sdCardSetup();
 
 
   //setup the global variables
-  HEATING_TEMPERATURE_LIMIT = 31.0; 
+  HEATING_TEMPERATURE_LIMIT = 20.0; //initialize with room temperature: no heating at the beginning
   LIQUID_LEVEL_SET = 8.6; // in inch
   pH_SET = 7.0;
 
+ //update the epoch time stamp if the NTP server is available  
+ ethernetSyncNTPTime();
 
   // update all the sensor data for once before doing the first log
   globalUpdateSensors();
@@ -123,18 +131,21 @@ void loop()
   case BIOREACTOR_MANUAL_MODE:  
     heatingRetulatePIDControl();
     timerUpdateSensors.check();
+    timerSyncNTP.check();
     timerGetCommandPushLog.check();
     break;  
 
   case BIOREACTOR_STANDBY_MODE: 
     //no heating
     timerUpdateSensors.check();
+    timerSyncNTP.check();
     timerGetCommandPushLog.check();
     break;
 
   case BIOREACTOR_RUNNING_MODE: 
     heatingRetulatePIDControl();
     timerUpdateSensors.check();
+    timerSyncNTP.check();
     timerGetCommandPushLog.check();
     //automatic program
     if(liquidLevelGet()>=8.25)
@@ -154,6 +165,7 @@ void loop()
     //and turn on the perilstaltic pump on until a predefined liquid level has been reached    
     timerPumpingOut.check();
     timerUpdateSensors.check();
+    timerSyncNTP.check();
     timerGetCommandPushLog.check();
     if(liquidLevelGet()<=5.75)
     {  
@@ -168,6 +180,13 @@ void loop()
 
     break;
 
+  case BIOREACTOR_ERROR_MODE: 
+    //no heating
+    timerUpdateSensors.check();
+    timerSyncNTP.check();
+    timerGetCommandPushLog.check();
+    break;
+    
   default:
     Serial.print("ERROR: Bioreactor is in a undefined state! State: ");
     Serial.println(BIOREACTOR_MODE);
@@ -192,6 +211,10 @@ void loop()
       relaySwitchMotorTurnOff();
       relaySwitchPumpOutTurnOff();
       relaySwitchPumpInTurnOff();
+      gasValvesCH4TurnOff();
+      gasValvesCO2TurnOff();
+      gasValvesN2TurnOff();
+
 
       break;
 
@@ -208,7 +231,10 @@ void loop()
       bioreactorAncientMode = BIOREACTOR_MODE; 
       //stop the motor for the stearing
       relaySwitchMotorTurnOff();
-      relaySwitchPumpInTurnOff(); 
+      relaySwitchPumpInTurnOff();
+      gasValvesCH4TurnOff();
+      gasValvesCO2TurnOff();
+      gasValvesN2TurnOff(); 
       // turn on PumpOut after a predefined amount of time; done in the MAIN Bioreactor Switch
       timerPumpingOut.enable();
       timerPumpingOut.reset();
@@ -216,6 +242,20 @@ void loop()
 
       //stop the heating and don't execute the PID algorithm
       digitalWrite(PIN_HEATING_RESISTANCE,LOW); //Heating is OFF  
+      break;
+    
+    case BIOREACTOR_ERROR_MODE:
+      if(DEBUG) Serial.println("The Bioreactor is in ERROR mode.");
+      bioreactorAncientMode = BIOREACTOR_MODE;
+      
+      //stop EVERYTHING
+      relaySwitchMotorTurnOff();
+      relaySwitchPumpInTurnOff();
+      gasValvesCH4TurnOff();
+      gasValvesCO2TurnOff();
+      gasValvesN2TurnOff(); 
+      //stop the heating and don't execute the PID algorithm
+      digitalWrite(PIN_HEATING_RESISTANCE,LOW); //Heating is OFF       
       break;
 
     default:
