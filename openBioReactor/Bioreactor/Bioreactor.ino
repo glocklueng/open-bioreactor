@@ -104,8 +104,8 @@ void setup()
   LIQUID_LEVEL_SET = 8.6; // in inch
   pH_SET = 7.0;
 
- //update the epoch time stamp if the NTP server is available  
- ethernetSyncNTPTime();
+  //update the epoch time stamp if the NTP server is available  
+  ethernetSyncNTPTime();
 
   // update all the sensor data for once before doing the first log
   globalUpdateSensors();
@@ -125,28 +125,23 @@ void setup()
 
 void loop()
 {  
+  timerUpdateSensors.check();
+  timerSyncNTP.check();
+  timerGetCommandPushLog.check();
+
   // MAIN switch of the Bioreactor
   switch(BIOREACTOR_MODE)
   {
   case BIOREACTOR_MANUAL_MODE:  
     heatingRetulatePIDControl();
-    timerUpdateSensors.check();
-    timerSyncNTP.check();
-    timerGetCommandPushLog.check();
     break;  
 
   case BIOREACTOR_STANDBY_MODE: 
     //no heating
-    timerUpdateSensors.check();
-    timerSyncNTP.check();
-    timerGetCommandPushLog.check();
     break;
 
   case BIOREACTOR_RUNNING_MODE: 
     heatingRetulatePIDControl();
-    timerUpdateSensors.check();
-    timerSyncNTP.check();
-    timerGetCommandPushLog.check();
     //automatic program
     if(liquidLevelGet()>=8.25)
     { 
@@ -164,9 +159,6 @@ void loop()
     //wait for for a predefined amount of minutes  
     //and turn on the perilstaltic pump on until a predefined liquid level has been reached    
     timerPumpingOut.check();
-    timerUpdateSensors.check();
-    timerSyncNTP.check();
-    timerGetCommandPushLog.check();
     if(liquidLevelGet()<=5.75)
     {  
       // ask two times, to avoid artefacts (measurement errors)
@@ -182,11 +174,8 @@ void loop()
 
   case BIOREACTOR_ERROR_MODE: 
     //no heating
-    timerUpdateSensors.check();
-    timerSyncNTP.check();
-    timerGetCommandPushLog.check();
     break;
-    
+
   default:
     Serial.print("ERROR: Bioreactor is in a undefined state! State: ");
     Serial.println(BIOREACTOR_MODE);
@@ -243,11 +232,11 @@ void loop()
       //stop the heating and don't execute the PID algorithm
       digitalWrite(PIN_HEATING_RESISTANCE,LOW); //Heating is OFF  
       break;
-    
+
     case BIOREACTOR_ERROR_MODE:
       if(DEBUG) Serial.println("The Bioreactor is in ERROR mode.");
       bioreactorAncientMode = BIOREACTOR_MODE;
-      
+
       //stop EVERYTHING
       relaySwitchMotorTurnOff();
       relaySwitchPumpInTurnOff();
@@ -267,6 +256,7 @@ void loop()
 
 
 }
+
 
 
 
