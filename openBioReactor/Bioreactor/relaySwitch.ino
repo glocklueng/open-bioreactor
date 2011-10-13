@@ -3,6 +3,13 @@ void relaySwitchMotorTurnOff();
 void relaySwitchMotorTurnOn();
 int relaySwitchMotorGetState();
 void relaySwitchMotorSwitchState();
+void relaySwitchPumpOutTurnOff();
+void relaySwitchPumpOutTurnOn();
+int relaySwitchPumpOutGetState();
+void relaySwitchPumpInTurnOff();
+void relaySwitchPumpInTurnOn();
+int relaySwitchPumpInGetState();
+
 
 int relaySwitchMotorState = 0; // 1 if ON; 0 if OFF; other values reserved for error states
 int relaySwitchPumpOutState = 0;

@@ -1,5 +1,6 @@
 void heatingSetup();
 void heatingRetulatePIDControl();
+void heatingDebug();
 int heatingPIDRegOutput();
 
 /********************************************************
@@ -100,14 +101,14 @@ void heatingRetulatePIDControl()
     heatingRegSetpoint = 0;
     BIOREACTOR_MODE = BIOREACTOR_ERROR_MODE;
     Serial.println("WARNING: The temperature is outside the range! The bioreactor has been forced to standby mode!");
-    debug();
+    heatingDebug();
 
   } 
 
 }
 
 
-void debug() {
+void heatingDebug() {
   Serial.print("HEATING_MAX_ALLOWED_LIMIT: ");
   Serial.println(HEATING_MAX_ALLOWED_LIMIT); 
   Serial.print("TEMPERATURE_MIN_ALLOWED_LIMIT: ");

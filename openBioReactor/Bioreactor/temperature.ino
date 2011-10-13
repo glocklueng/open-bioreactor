@@ -1,4 +1,3 @@
-
 void temperatureSetup();
 void temperatureUpdate();
 boolean temperatureGetOneWire(byte *addr, float *retnTemp, OneWire * OW);

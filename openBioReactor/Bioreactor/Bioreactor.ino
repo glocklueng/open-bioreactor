@@ -65,7 +65,7 @@
 //#define LOG_TEMPERATURE_LENGTH 512// in bytes
 
 TimedAction timerUpdateSensors = TimedAction(10000,globalUpdateSensors); // value is in milisec
-TimedAction timerPumpingOut = TimedAction(600000,relaySwitchPumpOutTurnOn); //wait 10min=600'000milisec before pumping out
+TimedAction timerPumpingOut = TimedAction(2000,relaySwitchPumpOutTurnOn); //wait 10min=600'000milisec before pumping out (for the sedimentation of bacterias)
 TimedAction timerGetCommandPushLog = TimedAction(7000,globalGetCommandAndPushLog);
 TimedAction timerSyncNTP = TimedAction(3600000,ethernetSyncNTPTime); // sync NTP time from server every hour
 
