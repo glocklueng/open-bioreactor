@@ -27,8 +27,8 @@ PID heatingRegPID(&heatingRegInput, &heatingRegOutput, &heatingRegSetpoint, 7000
 
 void heatingSetup()
 {
-   pinMode(PIN_HEATING_RESISTANCE, OUTPUT);
-   //tell the PID to range between 0 and the full window size
+  pinMode(PIN_HEATING_RESISTANCE, OUTPUT);
+  //tell the PID to range between 0 and the full window size
   heatingRegPID.SetOutputLimits(0, HEATING_REGULATION_TIME_WINDOWS);
   //turn the PID on
   heatingRegPID.SetMode(AUTOMATIC);
@@ -42,12 +42,12 @@ void heatingSetup()
   heatingRegSetpoint = HEATING_TEMPERATURE_LIMIT;
 
   Serial.println("The Heating-Regulation-PID has been successfully initialized.");   
-   
-   if(DEBUG)
-   {
-     Serial.print("The temperature limit for PID regulation is set to: ");
-     Serial.println(heatingRegSetpoint); 
-   } 
+
+  if(DEBUG)
+  {
+    Serial.print("The temperature limit for PID regulation is set to: ");
+    Serial.println(heatingRegSetpoint); 
+  } 
 
 }
 
@@ -57,8 +57,8 @@ void heatingRetulatePIDControl()
   heatingRegInput = temperatureMeasuredInLiquid();
   heatingRegSetpoint = HEATING_TEMPERATURE_LIMIT;
   heatingRegPID.Compute(); // the computation takes only 30ms!
-  
-   // turn the output pin on/off based on pid output
+
+  // turn the output pin on/off based on pid output
   exactPresentTime = millis();
   if(exactPresentTime - heatingRegWindowStartTime > HEATING_REGULATION_TIME_WINDOWS)
   { 
@@ -72,7 +72,7 @@ void heatingRetulatePIDControl()
     heatingRegWindowStartTime += HEATING_REGULATION_TIME_WINDOWS;
     //if(DEBUG) Serial.println(heatingRegWindowStartTime);
   }
-  
+
   if(heatingRegOutput > exactPresentTime - heatingRegWindowStartTime) 
   {
     digitalWrite(PIN_HEATING_RESISTANCE,HIGH);
@@ -83,15 +83,15 @@ void heatingRetulatePIDControl()
     digitalWrite(PIN_HEATING_RESISTANCE,LOW);
     //if(DEBUG) Serial.print("Heating is OFF!\n");      
   }
- 
+
   // security algorithm: if the temperature of the bottom plate is higher than HEATING_MAX_ALLOWED_LIMIT degrees; 
   // turn heating of and put bioreactor in STAND BY state
   // if the measured temperature is lower than TEMPERATURE_MIN_ALLOWED_LIMIT, that means sensor is working WRONG! 
-  if(temperatureMeasuredBottomPlate() >= HEATING_MAX_ALLOWED_LIMIT
-     || temperatureMeasuredInLiquid() >= HEATING_MAX_ALLOWED_LIMIT
-     || temperatureMeasuredInLiquid() <= TEMPERATURE_MIN_ALLOWED_LIMIT
-     || temperatureMeasuredBottomPlate() <= TEMPERATURE_MIN_ALLOWED_LIMIT
-     || temperatureMeasuredAmbient() <= TEMPERATURE_MIN_ALLOWED_LIMIT
+  if(temperatureMeasuredBottomPlate() > HEATING_MAX_ALLOWED_LIMIT
+    || temperatureMeasuredInLiquid() > HEATING_MAX_ALLOWED_LIMIT
+    || temperatureMeasuredInLiquid() < TEMPERATURE_MIN_ALLOWED_LIMIT
+    || temperatureMeasuredBottomPlate() < TEMPERATURE_MIN_ALLOWED_LIMIT
+    || temperatureMeasuredAmbient() < TEMPERATURE_MIN_ALLOWED_LIMIT
     )
   {
     //override all important internal heating commands!
@@ -99,12 +99,29 @@ void heatingRetulatePIDControl()
     heatingRegInput = 0;
     heatingRegSetpoint = 0;
     BIOREACTOR_MODE = BIOREACTOR_ERROR_MODE;
-    Serial.println("WARNING: The maximum temperature has been exceeded! The bioreactor has been forced to standby mode!");
+    Serial.println("WARNING: The temperature is outside the range! The bioreactor has been forced to standby mode!");
+    debug();
+
   } 
-   
+
+}
+
+
+void debug() {
+  Serial.print("HEATING_MAX_ALLOWED_LIMIT: ");
+  Serial.println(HEATING_MAX_ALLOWED_LIMIT); 
+  Serial.print("TEMPERATURE_MIN_ALLOWED_LIMIT: ");
+  Serial.println(TEMPERATURE_MIN_ALLOWED_LIMIT); 
+  Serial.print("temperatureMeasuredBottomPlate: ");
+  Serial.println(temperatureMeasuredBottomPlate()); 
+  Serial.print("temperatureMeasuredInLiquid: ");
+  Serial.println(temperatureMeasuredInLiquid()); 
+  Serial.print("temperatureMeasuredAmbient: ");
+  Serial.println(temperatureMeasuredAmbient()); 
 }
 
 int heatingPIDRegOutput()
 {
- return heatingRegOutput;
+  return heatingRegOutput;
 }
+
