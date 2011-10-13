@@ -1,8 +1,6 @@
 void pHmeterUpdate();
 float pHmeterGet();
 
-//----------CONSTANTS---------
-
 
 float pHLevelGlobal;
 

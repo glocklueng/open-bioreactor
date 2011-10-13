@@ -1,6 +1,7 @@
 void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned bufLen = 0xffff);
 unsigned globalFloatToStringUnsigned(unsigned long val, char *buf, unsigned bufLen = 0xffff, byte width = 0);
 void globalUpdateSensors();
+void globalGetCommandAndPushLog();
 //boolean globalSelectSDCard();
 //boolean globalSelectEthernet();
 
@@ -10,8 +11,8 @@ void globalUpdateSensors();
 // zeroes to achieve the specified width.  The number of characters added to
 // the buffer (not including the null termination) is returned.
 //
-unsigned
-globalFloatToStringUnsigned(unsigned long val, char *buf, unsigned bufLen, byte width)
+
+unsigned globalFloatToStringUnsigned(unsigned long val, char *buf, unsigned bufLen, byte width)
 {
   if (!buf || !bufLen)
     return(0);

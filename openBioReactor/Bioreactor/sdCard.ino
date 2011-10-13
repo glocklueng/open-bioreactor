@@ -1,4 +1,4 @@
-
+void sdCardSetup();
 
 void sdCardSetup()
 {

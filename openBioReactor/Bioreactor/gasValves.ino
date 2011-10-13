@@ -1,3 +1,14 @@
+void gasValvesSetup();
+void gasValvesCH4TurnOff();
+void gasValvesCH4TurnOn();
+int gasValvesCH4GetState();
+void gasValvesCO2TurnOff();
+void gasValvesCO2TurnOn();
+int gasValvesCO2GetState();
+void gasValvesN2TurnOff();
+void gasValvesN2TurnOn();
+int gasValvesN2GetState();
+
 
 int gasValvesCH4State = 0;
 int gasValvesCO2State = 0;
