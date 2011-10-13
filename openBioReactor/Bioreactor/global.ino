@@ -64,7 +64,6 @@ void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned b
   const byte maxPrecision = 6;
   if (precision > maxPrecision)
     precision = maxPrecision;
-
   if (--bufLen > 0)
   {
     // check for a negative value
@@ -74,7 +73,6 @@ void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned b
       *buf = '-';
       bufLen--;
     }
-
     // compute the rounding factor and fractional multiplier
     double roundingFactor = 0.5;
     unsigned long mult = 1;
@@ -83,7 +81,6 @@ void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned b
       roundingFactor /= 10.0;
       mult *= 10;
     }
-
     if (bufLen > 0)
     {
       // apply the rounding factor
@@ -94,7 +91,6 @@ void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned b
       buf += len;
       bufLen -= len;
     }
-
     // handle the fractional portion
     if ((precision > 0) && (bufLen > 0))
     {
@@ -103,14 +99,13 @@ void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned b
         buf += globalFloatToStringUnsigned((unsigned long)((val - (unsigned long)val) * mult), buf, bufLen, precision);
     }
   }
-
   // null-terminate the string
   *buf = '\0';
 } 
 
 void globalUpdateSensors()
 {
-  //temperatureUpdate();
+  temperatureUpdate();
   pHmeterUpdate();
   liquidLevelUpdate();  
 }
@@ -119,8 +114,8 @@ void globalGetCommandAndPushLog()
 {
   //the network related functions have to be together; 
   //else there is a memory allocation failure of the "String"s (bug in Arduino IDE 0022)
-   ethernetGetCommand();
-   loggingEvent();  
+  ethernetGetCommand();
+  loggingEvent();  
 }
 
 
@@ -165,5 +160,6 @@ void globalGetCommandAndPushLog()
 //  else if(DEBUG)Serial.println("Ethernet already initialized!");
 //
 //}
+
 
 
