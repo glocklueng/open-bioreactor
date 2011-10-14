@@ -13,7 +13,7 @@ void loggingEvent()
   int notImplemented = -1; // for the values that have not yet been implemented, "-1" is printed
   int logDataStringLength;
 
-  if(DEBUG)Serial.println("logging...");
+  // if (DEBUG) Serial.println("logging...");
 
   /*
   Log all variable data from all sensors 
@@ -50,7 +50,7 @@ void loggingEvent()
   //no line end! Threat this separately for logging into the SD card and via ethernet on the server
 
 
-  if(DEBUG)
+  if(DEBUG && false)
   {
     Serial.println(logDataString);
     Serial.print("Size of the string is: ");
