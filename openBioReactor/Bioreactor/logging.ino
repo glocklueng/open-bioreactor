@@ -25,18 +25,18 @@ void loggingEvent()
 
 
   logDataStringLength = sprintf(logDataString, 
-  "%lu,%d,%0d.%d,%0d.%d,%.2f,%.2f,%.2f,%.2f,%d,%d,%.2f,%d,%d,%d,%d,%d,%d,%d,%d",
+  "%lu,%d,%0d.%d,%0d.%d,%0d.%d,%0d.%d,%0d.%d,%d,%d,%d,%0d.%d,%d,%d,%d,%d,%d,%d,%d,%d",
   ethernetGetTimeStamp(),
   BIOREACTOR_ID,
-  HEATING_TEMPERATURE_LIMIT, (int)((  HEATING_TEMPERATURE_LIMIT - (int)  HEATING_TEMPERATURE_LIMIT)*100),
-  temperatureMeasuredInLiquid(), (int)((temperatureMeasuredInLiquid() - (int)temperatureMeasuredInLiquid())*100),
-  temperatureMeasuredBottomPlate(),
-  temperatureMeasuredAmbient(),
-  heatingPIDRegOutput(),
-  liquidLevelGet(),
+  (int)HEATING_TEMPERATURE_LIMIT, (int)(((HEATING_TEMPERATURE_LIMIT - (int)HEATING_TEMPERATURE_LIMIT)*100)),
+  (int)temperatureMeasuredInLiquid(), (int)(((temperatureMeasuredInLiquid() - (int)temperatureMeasuredInLiquid())*100)),
+  (int)temperatureMeasuredBottomPlate(), (int)(((temperatureMeasuredBottomPlate() - (int)temperatureMeasuredBottomPlate())*100)),
+  (int)temperatureMeasuredAmbient(), (int)(((temperatureMeasuredAmbient() - (int)temperatureMeasuredAmbient())*100)),
+  (int)heatingPIDRegOutput(), (int)(((heatingPIDRegOutput() - (int)heatingPIDRegOutput())*100)),
+  (int)liquidLevelGet(),
   notImplemented,
   notImplemented,
-  pHmeterGet(),
+  (int)pHmeterGet(), (int)(((pHmeterGet() - (int)pHmeterGet())*100)),
   notImplemented,
   notImplemented,
   relaySwitchMotorGetState(),
@@ -60,6 +60,8 @@ void loggingEvent()
   ethernetPushLog(logDataString); 
 
 }
+
+
 
 
 
