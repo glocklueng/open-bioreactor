@@ -486,34 +486,30 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
 
   } 
   else if (strcmp(fieldName,"waitTime")==0) {
-
+    if(extractedValueInt != WAIT_TIME_BEFORE_PUMPING_OUT)
+    {
+      // check if the input value is valid, then safe it
+      if(extractedValueInt > WAIT_TIME_BEFORE_PUMPING_OUT_MAX)
+      {
+        if(DEBUG)Serial.print("WARNING: The Wait Time is to high! Maximum allowed Wait Time is [millisec]:");
+        if(DEBUG)Serial.println(WAIT_TIME_BEFORE_PUMPING_OUT_MAX);
+      }
+      else if (extractedValueInt < WAIT_TIME_BEFORE_PUMPING_OUT_MIN)
+      {
+        if(DEBUG)Serial.print("WARNING: The Wait Time is to low! Minimum allowed Wait Time is [millisec]:");
+        if(DEBUG)Serial.println(WAIT_TIME_BEFORE_PUMPING_OUT_MIN);
+      }
+      else
+      {
+        WAIT_TIME_BEFORE_PUMPING_OUT = extractedValueInt;
+        if(DEBUG)Serial.print("The new Wait Time has been successfully set to [millisec]: ");
+        if(DEBUG)Serial.println(WAIT_TIME_BEFORE_PUMPING_OUT);
+      }
+    }
+    else if(DEBUG)Serial.println("The Wait Time is the same as the saved one.");
   } 
   else if (strcmp(fieldName,"methaneIn")==0) {
 
-    //---------Set gas valve (methane) state ----------
-    // only get the pump's state if in MANUAL mode
-    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-    {
-
-      // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesCH4GetState())
-      {
-        // check if the input value is valid, then safe it
-        if(extractedValueInt == 1 || extractedValueInt == 0 )
-        {
-          //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesCH4TurnOn();
-          else gasValvesCH4TurnOff(); // if extractedValueInt = 0
-          if(DEBUG)Serial.println("The gas valve (methane) has been set to a new state.");
-        }
-        else
-        {
-          if(DEBUG)Serial.println("WARNING: The gas valve (methane) state is invalid!.");
-        }
-      }
-      else Serial.println("ERROR: The term 'methane:' couldn't have been found in the JSON command string. Please verify the command string.");
-    }
-    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
   } 
   else if (strcmp(fieldName,"carbonDioxideIn")==0) {
 
@@ -637,7 +633,31 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     else if(DEBUG) Serial.println("Not in MANUAL mode: Motor's value not taken");
   } 
   else if (strcmp(fieldName,"methane")==0) {
+   //---------Set gas valve (methane) state ----------
+    // only get the pump's state if in MANUAL mode
+    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    {
 
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != gasValvesCH4GetState())
+      {
+        // check if the input value is valid, then safe it
+        if(extractedValueInt == 1 || extractedValueInt == 0 )
+        {
+          //turn ON or OFF
+          if(extractedValueInt == 1) gasValvesCH4TurnOn();
+          else gasValvesCH4TurnOff(); // if extractedValueInt = 0
+          if(DEBUG)Serial.println("The gas valve (methane) has been set to a new state.");
+        }
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: The gas valve (methane) state is invalid!.");
+        }
+      }
+      else Serial.println("ERROR: The term 'methane:' couldn't have been found in the JSON command string. Please verify the command string.");
+    }
+    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
+    
   }   
   else if (strcmp(fieldName,"carbonDioxide")==0) {
     //---------Set gas valve (carbonDioxide) state ----------
