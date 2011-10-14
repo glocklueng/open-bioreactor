@@ -258,10 +258,8 @@ char * ethernetGetTimeStampChar()
 void ethernetPushLog(char *logString)
 {
   digitalWrite(PIN_SD_CARD,HIGH); // Disable SD card first
-  
-
   //open a connection and try to print 
-  if(DEBUG)Serial.println("Connecting to server...");
+  if(DEBUG)Serial.println("PUSH LOG: Connecting to server...");
   client.connect(server,80);
  
  long start=millis(); 
@@ -271,10 +269,6 @@ void ethernetPushLog(char *logString)
   }
   if (DEBUG) Serial.print("Connection achieved in (ms): ");
   if (DEBUG) Serial.println(millis()-start);
-  
-
-  // if there are incoming bytes available 
-  // from the server, read them and print them:
   if (client.connected()) {
 
       char pushUrl[LOG_MAX_LENGTH+50];
@@ -283,17 +277,13 @@ void ethernetPushLog(char *logString)
       strcat(pushUrl,logString);
       strcat(pushUrl," HTTP/1.0\n\n");
     
-        if (DEBUG) Serial.print("Push URL: ");
-        if (DEBUG) Serial.println(pushUrl);
-        client.println(pushUrl);
-
+    if (DEBUG) Serial.print("Push URL: ");
+    if (DEBUG) Serial.println(pushUrl);
+    client.println(pushUrl);
     if (DEBUG) Serial.print("The log has been pushed to the server.");
-
   }
-
   client.stop();
-  if(DEBUG)Serial.println("Disconnected.");
-
+  if (DEBUG) Serial.println("PUSH LOG: Disconnected.");
 }
 
 void ethernetGetCommand()
