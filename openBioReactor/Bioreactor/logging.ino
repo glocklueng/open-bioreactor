@@ -25,7 +25,7 @@ void loggingEvent()
 
 
   logDataStringLength = sprintf(logDataString, 
-  "%lu,%d,%0d.%d,%0d.%d,%0d.%d,%0d.%d,%0d.%d,%d,%d,%d,%0d.%d,%d,%d,%d,%d,%d,%d,%d,%d",
+  "%lu,%d,%d.%02d,%d.%02d,%d.%02d,%d.%02d,%d.%02d,%d,%d,%d,%d.%02d,%d,%d,%d,%d,%d,%d,%d,%d",
   ethernetGetTimeStamp(),
   BIOREACTOR_ID,
   (int)HEATING_TEMPERATURE_LIMIT, (int)(((HEATING_TEMPERATURE_LIMIT - (int)HEATING_TEMPERATURE_LIMIT)*100)),
