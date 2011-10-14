@@ -8,21 +8,23 @@ float temperatureMeasuredAmbient();
 
 /*
 This code was taken from the Arduino forum (arduino.cc).
-It has been modified to meet the project's needs.
-*/
+ It has been modified to meet the project's needs.
+ */
 
 
 // DS18S20 Temperature chip i/o
-OneWire dsBottom(PIN_TEMPERATURE_SENSOR_BOTTOM);
-OneWire dsInLiquid(PIN_TEMPERATURE_SENSOR_IN_LIQUID);
-OneWire dsAmbient(PIN_TEMPERATURE_SENSOR_AMBIENT);
-//ID of temperature sensor on the bottom of the heating plate
-byte SENSOR_BOTTOM[8]= {
-  0x28,0x3F,0xA8,0x23,0x03,0x00,0x00,0xC6};
-byte SENSOR_IN_LIQUID[8] = {
-  0x28,0xD0,0x93,0x64,0x03,0x00,0x00,0x59};
-byte SENSOR_AMBIENT[8] = {
-  0x28,0xD4,0xA5,0x23,0x03,0x00,0x00,0xFB};
+OneWire owBottom(PIN_TEMPERATURE_SENSOR_BOTTOM);
+OneWire owInLiquid(PIN_TEMPERATURE_SENSOR_IN_LIQUID);
+OneWire owAmbient(PIN_TEMPERATURE_SENSOR_AMBIENT);
+
+DallasTemperature dsBottom(&owBottom);
+DallasTemperature dsInLiquid(&owInLiquid);
+DallasTemperature dsAmbient(&owAmbient);
+DeviceAddress deviceAddresBottom;
+DeviceAddress deviceAddressInLiquid;
+DeviceAddress deviceAddressAmbient;
+
+DeviceAddress tempDeviceAddress; // We'll use this variable to store a found device address
 
 
 float temperatureBottomPlate = 0.0;
@@ -39,108 +41,93 @@ void temperatureSetup()
   Serial.println("The temperature has been initialized.");
   Serial.print("The value of the temperature in the liquid has been set to: [C] ");
   Serial.println(HEATING_TEMPERATURE_LIMIT);
-  
-//  //write Header for LOG String destined for the .csv file
-//  temperatureLog = "Milisec,Temperature_bottomPlate,Temperature_inLiquid\n";
-//  temperatureLog += "Version:_in_[ms]"; // TODO: use better version control
-//  temperatureLog += millis();
-//  temperatureLog += "\n";
-//
-//  //create directories on the SD file
-//
-//  if(globalSelectSDCard())
-//  {
-//    if(!SD.exists("/LOG"))
-//    {
-//      // create directories if not present
-//      SD.mkdir("/LOG");
-//      if(DEBUG) Serial.println("The /LOG directory has been created.");
-//    }  
-//    else if(DEBUG) Serial.println("The /LOG directory already exists.");
-//  }
+
+  dsBottom.begin();
+  if (!dsBottom.getAddress(deviceAddresBottom, 0)) {
+    BIOREACTOR_MODE=BIOREACTOR_ERROR_MODE;
+    Serial.println("ALERT: Can not determine temperature of bottom plate");
+  } 
+  else {
+    dsBottom.setWaitForConversion(false);
+    dsBottom.setResolution(deviceAddresBottom, 12);
+    dsBottom.requestTemperatures();
+  }
+
+  dsInLiquid.begin();
+  if (!dsInLiquid.getAddress(deviceAddressInLiquid, 0)) {
+    BIOREACTOR_MODE=BIOREACTOR_ERROR_MODE;
+    Serial.println("ALERT: Can not determine temperature of liquid");
+  } 
+  else {
+    dsInLiquid.setWaitForConversion(false);
+    dsInLiquid.setResolution(deviceAddressInLiquid, 12);
+    dsInLiquid.requestTemperatures();
+  }
+
+  dsAmbient.begin();
+  if (!dsAmbient.getAddress(deviceAddressAmbient, 0)) {
+    Serial.println("WARNING: Can not determine ambient temperature");
+  } 
+  else {
+    dsAmbient.setWaitForConversion(false);
+    dsAmbient.setResolution(deviceAddressAmbient, 12);
+    dsAmbient.requestTemperatures();
+  }
+
+  //  //write Header for LOG String destined for the .csv file
+  //  temperatureLog = "Milisec,Temperature_bottomPlate,Temperature_inLiquid\n";
+  //  temperatureLog += "Version:_in_[ms]"; // TODO: use better version control
+  //  temperatureLog += millis();
+  //  temperatureLog += "\n";
+  //
+  //  //create directories on the SD file
+  //
+  //  if(globalSelectSDCard())
+  //  {
+  //    if(!SD.exists("/LOG"))
+  //    {
+  //      // create directories if not present
+  //      SD.mkdir("/LOG");
+  //      if(DEBUG) Serial.println("The /LOG directory has been created.");
+  //    }  
+  //    else if(DEBUG) Serial.println("The /LOG directory already exists.");
+  //  }
+
+  // We want to be sure that the conversion has been done
+  delay(600);
 
 
 }
 
 void temperatureUpdate()
 {
-  unsigned long exactPresentTime;
-  char charBufferTemperatureBottomPlate[8];
-  char charBufferTemperatureInLiquid[8];
-  char charBufferTemperatureAmbient[8];
+  dsBottom.requestTemperatures();
+  temperatureBottomPlate=dsBottom.getTempC(deviceAddresBottom);
+  if(DEBUG)
+  {
+    Serial.print("The measured temperature of the Heating-plate is: "); 
+    Serial.println(temperatureBottomPlate);
+  }
   
-  //get temperature on the bottom plate
-  if (temperatureGetOneWire(SENSOR_BOTTOM,&temperatureBottomPlate,&dsBottom))
+  dsInLiquid.requestTemperatures();
+  temperatureInLiquidPlate=dsInLiquid.getTempC(deviceAddresInLiquid);
+  if(DEBUG)
   {
-    if(DEBUG)
-    {
-      Serial.print("The measured temperature of the Heating-plate is: "); 
-      Serial.println(temperatureBottomPlate);
-    }
+    Serial.print("The measured temperature of the liquid is: "); 
+    Serial.println(temperatureInLiquidPlate);
   }
-  else Serial.println("ERROR: Temperature on heating resistance could NOT have been measured correctly!");
-
-  //get temperature in the liquid
-  if (temperatureGetOneWire(SENSOR_IN_LIQUID,&temperatureInLiquid,&dsInLiquid))
-  {
-    if(DEBUG)
-    {
-      Serial.print("The measured temperature in the liquid is: ");  
-      Serial.println(temperatureInLiquid);
-    }
-  }
-  else Serial.println("ERROR: Temperature in liquid could NOT have been measured correctly!");
   
-    //get ambient temperature 
-  if (temperatureGetOneWire(SENSOR_AMBIENT,&temperatureAmbient,&dsAmbient))
+  dsAmbient.requestTemperatures();
+  temperatureAmbientPlate=dsAmbient.getTempC(deviceAddresAmbient);
+  if(DEBUG)
   {
-    if(DEBUG)
-    {
-      Serial.print("The measured ambient temperature is: ");  
-      Serial.println(temperatureAmbient);
-    }
+    Serial.print("The measured ambient temperature is: "); 
+    Serial.println(temperatureAmbientPlate);
   }
-  else Serial.println("ERROR: Ambient temperature could NOT have been measured correctly!");
 }
 
 
 
-boolean temperatureGetOneWire(byte *addr, float *retnTemp, OneWire * OW)
-{
-  //Input: Pointer to the OneWire address of the temperature sensor; 
-  //       Pointer to a place to write the sensor reading; 
-  //       Pointer to the OneWire object
-
-  byte present = 0;
-  byte data[12];
-  int raw;
-
-  OW->reset();
-  OW->select(addr);
-  OW->write(0x44,0); // start conversion, with parasite power OFF at the end
-
-  // NO delay
-  //delay(800);     // maybe 750ms is enough, maybe not
-  // we might do a ds.depower() here, but the reset will take care of it.
-
-  present = OW->reset();
-  if (present)  //only continue if the sensor is actually there and responding
-  {
-    OW->select(addr);    
-    OW->write(0xBE);         // Read Scratchpad which now contains the temperature data
-    for ( int i = 0; i < 9; i++) {           // we need 9 bytes
-      data[i] = OW->read();
-    }
-    if ( OneWire::crc8( data, 8) != data[8]) {
-      if(DEBUG) Serial.println("CRC is not valid!\n");
-      return false;
-    }
-    raw=(data[1]<<8)+data[0];  //put the two bytes of the temperature (from the response) into a raw int
-    *retnTemp = (float)raw * 0.0625; //convert to celcius
-    return true;
-  }
-  return false;
-}
 
 float temperatureMeasuredInLiquid()
 {
@@ -212,6 +199,10 @@ float temperatureMeasuredAmbient()
 //  }
 //
 //}
+
+
+
+
 
 
 
