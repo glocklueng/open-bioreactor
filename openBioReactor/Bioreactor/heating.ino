@@ -1,7 +1,10 @@
 void heatingSetup();
 void heatingRetulatePIDControl();
 void heatingDebug();
+void heatingSecurityAlgorithm();
+void heatingDebug();
 int heatingPIDRegOutput();
+
 
 /********************************************************
  * PID RelayOutput Example from PID library 1.0.1
@@ -83,8 +86,12 @@ void heatingRetulatePIDControl()
   {
     digitalWrite(PIN_HEATING_RESISTANCE,LOW);
     //if(DEBUG) Serial.print("Heating is OFF!\n");      
-  }
+  } 
 
+}
+
+void heatingSecurityAlgorithm()
+{
   // security algorithm: if the temperature of the bottom plate is higher than HEATING_MAX_ALLOWED_LIMIT degrees; 
   // turn heating of and put bioreactor in STAND BY state
   // if the measured temperature is lower than TEMPERATURE_MIN_ALLOWED_LIMIT, that means sensor is working WRONG! 
@@ -97,16 +104,15 @@ void heatingRetulatePIDControl()
   {
     //override all important internal heating commands!
     digitalWrite(PIN_HEATING_RESISTANCE,LOW);
-    heatingRegInput = 0;
+    heatingRegInput = 1; // higher than Setpoint to avoid heating
     heatingRegSetpoint = 0;
     BIOREACTOR_MODE = BIOREACTOR_ERROR_MODE;
     Serial.println("WARNING: The temperature is outside the range! The bioreactor has been forced to standby mode!");
-    heatingDebug();
+    heatingDebug(); 
 
-  } 
+  }
 
 }
-
 
 void heatingDebug() {
   Serial.print("HEATING_MAX_ALLOWED_LIMIT: ");
@@ -125,4 +131,5 @@ int heatingPIDRegOutput()
 {
   return heatingRegOutput;
 }
+
 

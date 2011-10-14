@@ -25,6 +25,9 @@
 #define BIOREACTOR_PUMPING_MODE 3
 #define BIOREACTOR_ERROR_MODE 99
 
+#define WAIT_TIME_BEFORE_PUMPING_OUT_MIN 2000 // 2 sec
+#define WAIT_TIME_BEFORE_PUMPING_OUT_MAX 3600000//1 hour = 60*60*1000 milisec
+
 //----------CONSTANTS-HEATING---------
 #define PIN_HEATING_RESISTANCE 28//or 7 if on PWM
 //for the regulation of temperature values btw 10 and 45 [s] are commun
@@ -66,11 +69,8 @@
 #define TEMPERATURE_MIN_ALLOWED_LIMIT 15 // 15°C is the lowest allowed measured voltage; this Bioreactor is made for Cali, Colombia
 //#define LOG_TEMPERATURE_LENGTH 512// in bytes
 
-TimedAction timerUpdateSensors = TimedAction(10000,globalUpdateSensors); // value is in milisec
-TimedAction timerPumpingOut = TimedAction(2000,relaySwitchPumpOutTurnOn); //wait 10min=600'000milisec before pumping out (for the sedimentation of bacterias)
-TimedAction timerGetCommandPushLog = TimedAction(7000,globalGetCommandAndPushLog);
-TimedAction timerSyncNTP = TimedAction(3600000,ethernetSyncNTPTime); // sync NTP time from server every hour
 
+//----------GLOBAL VARIABLES--------- 
 //global variables used by functions and are set by WebUI
 boolean DEBUG = true;
 //limits set by user per WebUI
@@ -79,7 +79,15 @@ float LIQUID_LEVEL_WEB_MAX; // in arduino AD-intervals [0;1023]
 float LIQUID_LEVEL_WEB_MIN;
 float pH_SET;
 int BIOREACTOR_MODE;
+int WAIT_TIME_BEFORE_PUMPING_OUT = 5000; // in [milisec] exceptional definition: because of timer declaration
 int bioreactorAncientMode; // variable to detect a unique modechange
+
+
+//----------TIMER DECLARATION--------- 
+TimedAction timerUpdateSensors = TimedAction(10000,globalUpdateSensors); // value is in milisec
+TimedAction timerPumpingOut = TimedAction(WAIT_TIME_BEFORE_PUMPING_OUT,relaySwitchPumpOutTurnOn); //wait a predefined (by WebUI) time before pumping out (for the sedimentation of bacterias)
+TimedAction timerGetCommandPushLog = TimedAction(7000,globalGetCommandAndPushLog);
+TimedAction timerSyncNTP = TimedAction(3600000,ethernetSyncNTPTime); // sync NTP time from server every hour
 
 
 
