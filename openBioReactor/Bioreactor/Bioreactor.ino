@@ -38,7 +38,7 @@
 #define LIQUID_LEVEL_MAX 8.6f //in inch
 
 //----------CONSTANTS-LOGGING---------  
-#define LOG_MAX_LENGTH 1024 // in bytes  
+#define LOG_MAX_LENGTH 256 // in bytes  
 
 //----------CONSTANTS-RELAY-SWITCH---------  
 #define PIN_MOTOR 25
@@ -185,6 +185,7 @@ void loop()
   //detect if there is a changement of the mode and do "one time only" commands
   if(bioreactorAncientMode != BIOREACTOR_MODE)  
   {
+    ethernetPushStatus();
     switch(BIOREACTOR_MODE)
     {
     case BIOREACTOR_MANUAL_MODE:  
