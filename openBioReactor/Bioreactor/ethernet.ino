@@ -261,7 +261,6 @@ void ethernetPushLog(char *logString)
   //open a connection and try to print 
   if(DEBUG)Serial.println("PUSH LOG: Connecting to server...");
   client.connect(server,80);
- 
  long start=millis(); 
   while (! client.connected() && ((millis()-start)<500))
   {
@@ -280,7 +279,7 @@ void ethernetPushLog(char *logString)
     if (DEBUG) Serial.print("Push URL: ");
     if (DEBUG) Serial.println(pushUrl);
     client.println(pushUrl);
-    if (DEBUG) Serial.print("The log has been pushed to the server.");
+    if (DEBUG) Serial.println("The log has been pushed to the server.");
   }
   client.stop();
   if (DEBUG) Serial.println("PUSH LOG: Disconnected.");
@@ -289,18 +288,20 @@ void ethernetPushLog(char *logString)
 void ethernetGetCommand()
 {
   digitalWrite(PIN_SD_CARD,HIGH); // Disable SD card first
-  int i = 0;
   String jsonCommand = String(""); // reinitialize alocated string
   //char jsonCommandBuffer[MAX_HTTP_STRING_LENGTH]; // reserve space
 //  if(DEBUG)Serial.print("String initialized has length of: ");
 //  if(DEBUG)Serial.println(sizeof(jsonCommand));
   //open a connection and try to read the JSON command 
   if(DEBUG)Serial.println("Connecting to get newcommand...");
-  while(client.connect(server, 80) && i<500) // 500ms timeout
+  client.connect(server,80);
+   long start=millis(); 
+  while (! client.connected() && ((millis()-start)<500))
   {
-    i++;
     delay(1);
   }
+    if (DEBUG) Serial.print("Connection achieved in (ms): ");
+  if (DEBUG) Serial.println(millis()-start);
 
   // read the JSON object from the server and save it in a local String
   // for more informations look up www.json.org
@@ -308,8 +309,11 @@ void ethernetGetCommand()
   int jsonController = 0;
   client.println("GET /bioReacTor/command HTTP/1.0\n"); //connect to the command page of the server
   delay(100); // small delay is neccessary and 100ms has turned out to be a sufficient value
-  while (client.connected()) 
+  
+  start=millis(); 
+  while (client.connected() && ((millis()-start)<500)) 
   {
+    if (client.available()) {
     if(breakController >= MAX_HTTP_STRING_LENGTH) 
     {
       break; // if the read String to long
@@ -336,7 +340,7 @@ void ethernetGetCommand()
       jsonCommand += "}"; // complete the JSON string 
       break; // get out of while(client.connected()) and stop connection
     }
-
+  }
   }
 
  
