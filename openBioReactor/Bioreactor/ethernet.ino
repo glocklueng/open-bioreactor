@@ -388,20 +388,7 @@ void ethernetGetCommand()
   client.stop();
   if (DEBUG) Serial.print("Received command file in (ms): ");
   if (DEBUG) Serial.println(millis()-start);
-  /*
 
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   */
 
 }
 
@@ -432,29 +419,47 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     }
     else if(DEBUG)Serial.println("The set temperature is the same as the saved one (deviation <0.05).");
   } 
-  else if (strcmp(fieldName,"liquidLevel")==0) {
-    // first check if there is a difference between the read value and the stored one
-    // (because floats are used, an error value of 0.05 has been set!)
-    if(LIQUID_LEVEL_SET >= extractedValueFloat+0.05 || LIQUID_LEVEL_SET <= extractedValueFloat-0.05)
+  else if (strcmp(fieldName,"liquidLevelMax")==0) {
+    if(extractedValueInt != LIQUID_LEVEL_WEB_MAX)
     {
       // check if the input value is valid, then safe it
-      if(extractedValueFloat > LIQUID_LEVEL_MAX)
+      if(extractedValueInt > LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL)
       {
         if(DEBUG)Serial.println("WARNING: The input liquid level is to high! New liquid value has not been set.");
       }
-      else if (extractedValueFloat < 0.0)
+      else if (extractedValueInt < LIQUID_LEVEL_PHYSICAL_MIN_INTERVAL)
       {
         if(DEBUG)Serial.println("WARNING: The input liquid level negative! New liquid value has not been set.");
       }
       else
       {
-        LIQUID_LEVEL_SET = extractedValueFloat;
-        if(DEBUG)Serial.print("The new liquid level has been successfully set to [inch]: ");
-        if(DEBUG)Serial.println(LIQUID_LEVEL_SET);
+        LIQUID_LEVEL_WEB_MAX = extractedValueInt;
+        if(DEBUG)Serial.print("The new liquid level has been successfully set to [Arduino AD interval]: ");
+        if(DEBUG)Serial.println(LIQUID_LEVEL_WEB_MAX);
       }
     }
-    else if(DEBUG)Serial.println("The set liquid level is the same as the saved one (deviation <0.05).");
-
+    else if(DEBUG)Serial.println("The set liquid level is the same as the saved one.");
+  } 
+  else if (strcmp(fieldName,"liquidLevelMin")==0) {
+    if(extractedValueInt != LIQUID_LEVEL_WEB_MAX)
+    {
+      // check if the input value is valid, then safe it
+      if(extractedValueInt > LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL)
+      {
+        if(DEBUG)Serial.println("WARNING: The input liquid level is to high! New liquid value has not been set.");
+      }
+      else if (extractedValueInt < LIQUID_LEVEL_PHYSICAL_MIN_INTERVAL)
+      {
+        if(DEBUG)Serial.println("WARNING: The input liquid level negative! New liquid value has not been set.");
+      }
+      else
+      {
+        LIQUID_LEVEL_WEB_MIN = extractedValueInt;
+        if(DEBUG)Serial.print("The new liquid level has been successfully set to [Arduino AD interval]: ");
+        if(DEBUG)Serial.println(LIQUID_LEVEL_WEB_MIN);
+      }
+    }
+    else if(DEBUG)Serial.println("The set liquid level is the same as the saved one.");
   } 
   else if (strcmp(fieldName,"pH")==0) {
     // first check if there is a difference between the read value and the stored one
