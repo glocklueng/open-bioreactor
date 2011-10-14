@@ -313,6 +313,7 @@ void ethernetGetCommand()
   //  if(DEBUG)Serial.println(sizeof(jsonCommand));
   //open a connection and try to read the JSON command 
   if(DEBUG)Serial.println("Connecting to get newcommand...");
+
   ethernetOpenConnection80();
 
   // read the JSON object from the server and save it in a local String
@@ -320,7 +321,6 @@ void ethernetGetCommand()
   int breakController = 0;
   int jsonController = 0;
   client.println("GET /bioReacTor/command HTTP/1.0\n"); //connect to the command page of the server
-  delay(100); // small delay is neccessary and 100ms has turned out to be a sufficient value
 
   long start=millis(); 
   while (client.connected() && ((millis()-start)<500)) 
