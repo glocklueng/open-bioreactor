@@ -75,8 +75,7 @@ void temperatureUpdate()
     if(DEBUG)
     {
       Serial.print("The measured temperature of the Heating-plate is: "); 
-      globalFloatToStringDouble(temperatureBottomPlate,2,charBufferTemperatureBottomPlate); 
-      Serial.println(charBufferTemperatureBottomPlate);
+      Serial.println(temperatureBottomPlate);
     }
   }
   else Serial.println("ERROR: Temperature on heating resistance could NOT have been measured correctly!");
@@ -87,8 +86,7 @@ void temperatureUpdate()
     if(DEBUG)
     {
       Serial.print("The measured temperature in the liquid is: ");  
-      globalFloatToStringDouble(temperatureInLiquid,2,charBufferTemperatureInLiquid);
-      Serial.println(charBufferTemperatureInLiquid);
+      Serial.println(temperatureInLiquid);
     }
   }
   else Serial.println("ERROR: Temperature in liquid could NOT have been measured correctly!");
@@ -99,36 +97,10 @@ void temperatureUpdate()
     if(DEBUG)
     {
       Serial.print("The measured ambient temperature is: ");  
-      globalFloatToStringDouble(temperatureAmbient,2,charBufferTemperatureAmbient);
-      Serial.println(charBufferTemperatureAmbient);
+      Serial.println(temperatureAmbient);
     }
   }
   else Serial.println("ERROR: Ambient temperature could NOT have been measured correctly!");
-//
-//  //Save the values in the LOG String
-//  exactPresentTime = millis();
-//  temperatureLog += exactPresentTime;
-//  temperatureLog += ",";
-//  temperatureLog += charBufferTemperatureBottomPlate;
-//  temperatureLog += ",";
-//  temperatureLog += charBufferTemperatureInLiquid;
-//  temperatureLog += "\n";
-//
-//  //write to SD card if the String buffer has reached max. defined length
-//  if(temperatureLog.length() >= LOG_TEMPERATURE_LENGTH) // write to SD card.
-//  {
-//    if(DEBUG)
-//    {
-//      Serial.println("The String buffer is going to be written on the SD card.");
-//      Serial.print("The size of the Temperature data String is: ");
-//      Serial.println(temperatureLog.length());  
-//      //Serial.print("The dataString is: \n\n");
-//      //Serial.println(temperatureLog);
-//    }
-//    temperatureWriteLogToSDcard();
-//    
-//  }
-
 }
 
 
