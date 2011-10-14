@@ -110,23 +110,21 @@ void temperatureUpdate()
   }
   
   dsInLiquid.requestTemperatures();
-  temperatureInLiquidPlate=dsInLiquid.getTempC(deviceAddresInLiquid);
+  temperatureInLiquid=dsInLiquid.getTempC(deviceAddressInLiquid);
   if(DEBUG)
   {
     Serial.print("The measured temperature of the liquid is: "); 
-    Serial.println(temperatureInLiquidPlate);
+    Serial.println(temperatureInLiquid);
   }
   
   dsAmbient.requestTemperatures();
-  temperatureAmbientPlate=dsAmbient.getTempC(deviceAddresAmbient);
+  temperatureAmbient=dsAmbient.getTempC(deviceAddressAmbient);
   if(DEBUG)
   {
     Serial.print("The measured ambient temperature is: "); 
-    Serial.println(temperatureAmbientPlate);
+    Serial.println(temperatureAmbient);
   }
 }
-
-
 
 
 float temperatureMeasuredInLiquid()
