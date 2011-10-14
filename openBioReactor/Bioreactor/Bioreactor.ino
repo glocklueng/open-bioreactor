@@ -185,17 +185,16 @@ void loop()
   //detect if there is a changement of the mode and do "one time only" commands
   if(bioreactorAncientMode != BIOREACTOR_MODE)  
   {
+    bioreactorAncientMode = BIOREACTOR_MODE;
     ethernetPushStatus();
     switch(BIOREACTOR_MODE)
     {
     case BIOREACTOR_MANUAL_MODE:  
-      if(DEBUG) Serial.println("The Bioreactor is in manual mode.");
-      bioreactorAncientMode = BIOREACTOR_MODE;
+      if(DEBUG) Serial.println("SWITCHING BIOREACTOR TO: manual mode.");
       break;
 
     case BIOREACTOR_STANDBY_MODE:
-      if(DEBUG) Serial.println("The Bioreactor is in stand-by mode.");      
-      bioreactorAncientMode = BIOREACTOR_MODE;
+      if(DEBUG) Serial.println("SWITCHING BIOREACTOR TO: stand-by mode.");      
       //only update sensors and log
       //make sure the motor and pumps are off
       relaySwitchMotorTurnOff();
@@ -204,21 +203,17 @@ void loop()
       gasValvesCH4TurnOff();
       gasValvesCO2TurnOff();
       gasValvesN2TurnOff();
-
-
       break;
 
     case BIOREACTOR_RUNNING_MODE: 
-      if(DEBUG) Serial.println("The Bioreactor is in running mode.");
-      bioreactorAncientMode = BIOREACTOR_MODE;
+      if(DEBUG) Serial.println("SWITCHING BIOREACTOR TO: running mode.");
       relaySwitchMotorTurnOn();
       relaySwitchPumpOutTurnOff();
       relaySwitchPumpInTurnOn();
       break;
 
     case BIOREACTOR_PUMPING_MODE: 
-      if(DEBUG) Serial.println("The Bioreactor is in pumping mode.");
-      bioreactorAncientMode = BIOREACTOR_MODE; 
+      if(DEBUG) Serial.println("SWITCHING BIOREACTOR TO: pumping mode.");
       //stop the motor for the stearing
       relaySwitchMotorTurnOff();
       relaySwitchPumpInTurnOff();
@@ -235,9 +230,7 @@ void loop()
       break;
 
     case BIOREACTOR_ERROR_MODE:
-      if(DEBUG) Serial.println("The Bioreactor is in ERROR mode.");
-      bioreactorAncientMode = BIOREACTOR_MODE;
-
+      if(DEBUG) Serial.println("SWITCHING BIOREACTOR TO: ERROR mode.");
       //stop EVERYTHING
       relaySwitchMotorTurnOff();
       relaySwitchPumpInTurnOff();
@@ -249,7 +242,7 @@ void loop()
       break;
 
     default:
-      Serial.print("ERROR: Bioreactor is in a undefined state! State: ");
+      Serial.print("SWITCHING BIOREACTOR TO: an undefined state! State: ");
       Serial.println(BIOREACTOR_MODE);
     }
   }
