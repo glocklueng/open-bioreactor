@@ -4,7 +4,7 @@ unsigned long ethernetSendNTPpacket(byte *address);
 void ethernetUpdateNTPTimeStamp();
 unsigned long ethernetGetTimeStamp();
 char * ethernetGetTimeStampChar();
-void ethernetPushLog(String logString);
+void ethernetPushLog(char *logString);
 void ethernetGetCommand();
 
 /*
@@ -255,7 +255,7 @@ char * ethernetGetTimeStampChar()
   
 }
 
-void ethernetPushLog(String logString)
+void ethernetPushLog(char *logString)
 {
   digitalWrite(PIN_SD_CARD,HIGH); // Disable SD card first
   int i=0;
@@ -271,20 +271,11 @@ void ethernetPushLog(String logString)
   // if there are incoming bytes available 
   // from the server, read them and print them:
   if (client.connected()) {
-    //    char c = client.read();
-    //    if(DEBUG)Serial.print(c);
-    
-    // use strcpy and strcat and work with CHAR arrays instead of "String" from Arduino;
-   //because of bugs in String memory allocation!! (Arduino IDE: 0022)
-   
-     int dataStringLength = logString.length() + 1; // else the last character is not printed
-      char bufferUrl[dataStringLength];
-      dataStringLength += 50; // reserve space for aditional characters of the URL string
-      char pushUrl[dataStringLength];
-      logString.toCharArray(bufferUrl,sizeof(bufferUrl));
+
+      char pushUrl[LOG_MAX_LENGTH+50];
         
       strcpy(pushUrl,"GET /bioReacTor/add.php?");
-      strcat(pushUrl,bufferUrl);
+      strcat(pushUrl,logString);
       strcat(pushUrl," HTTP/1.0\n\n");
     
         if(DEBUG)Serial.print(sizeof(pushUrl));
