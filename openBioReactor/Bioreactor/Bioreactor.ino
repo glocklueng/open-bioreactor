@@ -35,7 +35,9 @@
 
 //----------CONSTANTS-LIQUID-LEVEL---------
 #define PIN_LIQUID_LEVEL A5
-#define LIQUID_LEVEL_MAX 8.6f //in inch
+#define LIQUID_LEVEL_PHYSICAL_MAX 8.6f //in inch
+#define LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL 1023 //Arduino interval from 0 to 1023
+#define LIQUID_LEVEL_PHYSICAL_MIN_INTERVAL 0
 
 //----------CONSTANTS-LOGGING---------  
 #define LOG_MAX_LENGTH 256 // in bytes  
@@ -73,7 +75,8 @@ TimedAction timerSyncNTP = TimedAction(3600000,ethernetSyncNTPTime); // sync NTP
 boolean DEBUG = true;
 //limits set by user per WebUI
 float HEATING_TEMPERATURE_LIMIT; 
-float LIQUID_LEVEL_SET; // in inch
+float LIQUID_LEVEL_WEB_MAX; // in arduino AD-intervals [0;1023]
+float LIQUID_LEVEL_WEB_MIN;
 float pH_SET;
 int BIOREACTOR_MODE;
 int bioreactorAncientMode; // variable to detect a unique modechange
@@ -101,7 +104,8 @@ void setup()
 
   //setup the global variables
   HEATING_TEMPERATURE_LIMIT = 20.0; //initialize with room temperature: no heating at the beginning
-  LIQUID_LEVEL_SET = 8.6; // in inch
+  LIQUID_LEVEL_WEB_MAX = 1023; // Arduino internal AD-intervals
+  LIQUID_LEVEL_WEB_MIN = 0;
   pH_SET = 7.0;
 
   //update the epoch time stamp if the NTP server is available  
@@ -143,11 +147,11 @@ void loop()
   case BIOREACTOR_RUNNING_MODE: 
     heatingRetulatePIDControl();
     //automatic program
-    if(liquidLevelGet()>=8.25)
+    if(liquidLevelGet()>=LIQUID_LEVEL_WEB_MAX)
     { 
       // ask two times, to avoid artefacts (measurement errors)
       globalUpdateSensors();
-      if(liquidLevelGet()>=8.25) 
+      if(liquidLevelGet()>=LIQUID_LEVEL_WEB_MAX) 
       { 
         BIOREACTOR_MODE = BIOREACTOR_PUMPING_MODE;  
       } 
@@ -159,11 +163,11 @@ void loop()
     //wait for for a predefined amount of minutes  
     //and turn on the perilstaltic pump on until a predefined liquid level has been reached    
     timerPumpingOut.check();
-    if(liquidLevelGet()<=5.75)
+    if(liquidLevelGet()<=LIQUID_LEVEL_WEB_MIN)
     {  
       // ask two times, to avoid artefacts (measurement errors)
       globalUpdateSensors();
-      if(liquidLevelGet()<=5.75)
+      if(liquidLevelGet()<=LIQUID_LEVEL_WEB_MIN)
       {  
         BIOREACTOR_MODE = BIOREACTOR_RUNNING_MODE;
         timerPumpingOut.disable();      
