@@ -399,97 +399,16 @@ void ethernetGetCommand()
    
    
    
-   //---------Set gas sensor (carbonDioxide) state ----------
-   // only get the pump's state if in MANUAL mode
-   if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-   {
-   searchString = "carbonDioxide:"; // don't forget the separator ':'
-   indexBufferStart = jsonCommand.indexOf(searchString); // index of the first letter
-   indexBufferEnd = jsonCommand.indexOf(",",indexBufferStart); // search the end-index of the name + value in the JSON object
-   if(indexBufferEnd > indexBufferStart)// continue
-   {
-   indexBufferStart += searchString.length();
    
-   extractedValue = jsonCommand.substring(indexBufferStart,indexBufferEnd);//extract the temperature
-   extractedValue.toCharArray(extractedValueChar,6); // 6 characters for the buffer is enough
-   extractedValueInt = atoi(extractedValueChar);
-   
-   // first check if there is a difference between the read value and the stored one
-   if(extractedValueInt != gasValvesCO2GetState())
-   {
-   // check if the input value is valid, then safe it
-   if(extractedValueInt == 1 || extractedValueInt == 0 )
-   {
-   //turn ON or OFF
-   if(extractedValueInt == 1) gasValvesCO2TurnOn();
-   else gasValvesCO2TurnOff(); // if extractedValueInt = 0
-   if(DEBUG)Serial.println("The gas sensor (carbonDioxide) has been set to a new state.");
-   }
-   else
-   {
-   if(DEBUG)Serial.println("WARNING: The gas sensor (carbonDioxide) state is invalid!.");
-   }
-   }
-   else if(DEBUG)Serial.println("The gas sensor (carbonDioxide) state is the same as the saved one.");
-   
-   
-   }
-   else Serial.println("ERROR: The term 'carbonDioxide:' couldn't have been found in the JSON command string. Please verify the command string.");
-   }
-   else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
-   
-   
-   //---------Set gas sensor (nitrogen) state ----------
-   // only get the pump's state if in MANUAL mode
-   if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-   {
-   searchString = "nitrogen:"; // don't forget the separator ':'
-   indexBufferStart = jsonCommand.indexOf(searchString); // index of the first letter
-   indexBufferEnd = jsonCommand.indexOf("}",indexBufferStart); 
-   // THE '}' IS ONLY A WORKAROUND; change to ',' if not at the end of the string
-   if(indexBufferEnd > indexBufferStart)// continue
-   {
-   indexBufferStart += searchString.length();
-   
-   extractedValue = jsonCommand.substring(indexBufferStart,indexBufferEnd);//extract the temperature
-   extractedValue.toCharArray(extractedValueChar,6); // 6 characters for the buffer is enough
-   extractedValueInt = atoi(extractedValueChar);
-   
-   // first check if there is a difference between the read value and the stored one
-   if(extractedValueInt != gasValvesN2GetState())
-   {
-   // check if the input value is valid, then safe it
-   if(extractedValueInt == 1 || extractedValueInt == 0 )
-   {
-   //turn ON or OFF
-   if(extractedValueInt == 1) gasValvesN2TurnOn();
-   else gasValvesN2TurnOff(); // if extractedValueInt = 0
-   if(DEBUG)Serial.println("The gas sensor (nitrogen) has been set to a new state.");
-   }
-   else
-   {
-   if(DEBUG)Serial.println("WARNING: The gas sensor (nitrogen) state is invalid!.");
-   }
-   }
-   else if(DEBUG)Serial.println("The gas sensor (nitrogen) state is the same as the saved one.");
-   
-   
-   }
-   else Serial.println("ERROR: The term 'nitrogen:' couldn't have been found in the JSON command string. Please verify the command string.");
-   }
-   else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
-   
-   
-   
-   }// end of if(jsonCommand.equals(""))
    
    */
 
 }
 
 
-void ethernetParseCommandValue(char *fieldName, double fieldValue)
+void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
 {
+  int extractedValueInt=(int)extractedValueFloat;
   if (strcmp(fieldName,"liquidTemp")==0) {
     // first check if there is a difference between the read value and the stored one
     // (because floats are used, an error value of 0.05 has been set!)
@@ -566,7 +485,7 @@ void ethernetParseCommandValue(char *fieldName, double fieldValue)
   } 
   else if (strcmp(fieldName,"methaneIn")==0) {
 
-    //---------Set gas sensor (methane) state ----------
+    //---------Set gas valve (methane) state ----------
     // only get the pump's state if in MANUAL mode
     if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
     {
@@ -580,11 +499,11 @@ void ethernetParseCommandValue(char *fieldName, double fieldValue)
           //turn ON or OFF
           if(extractedValueInt == 1) gasValvesCH4TurnOn();
           else gasValvesCH4TurnOff(); // if extractedValueInt = 0
-          if(DEBUG)Serial.println("The gas sensor (methane) has been set to a new state.");
+          if(DEBUG)Serial.println("The gas valve (methane) has been set to a new state.");
         }
         else
         {
-          if(DEBUG)Serial.println("WARNING: The gas sensor (methane) state is invalid!.");
+          if(DEBUG)Serial.println("WARNING: The gas valve (methane) state is invalid!.");
         }
       }
       else Serial.println("ERROR: The term 'methane:' couldn't have been found in the JSON command string. Please verify the command string.");
@@ -634,36 +553,25 @@ void ethernetParseCommandValue(char *fieldName, double fieldValue)
     // only get the pump's state if in MANUAL mode
     if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
     {
-      searchString = "pumpOut:"; // don't forget the separator ':'
-      indexBufferStart = jsonCommand.indexOf(searchString); // index of the first letter
-      indexBufferEnd = jsonCommand.indexOf(",",indexBufferStart); // search the end-index of the name + value in the JSON object
-      if(indexBufferEnd > indexBufferStart)// continue
+
+
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != relaySwitchPumpOutGetState())
       {
-        indexBufferStart += searchString.length();
-
-        extractedValue = jsonCommand.substring(indexBufferStart,indexBufferEnd);//extract the temperature
-        extractedValue.toCharArray(extractedValueChar,6); // 6 characters for the buffer is enough
-        extractedValueInt = atoi(extractedValueChar);
-
-        // first check if there is a difference between the read value and the stored one
-        if(extractedValueInt != relaySwitchPumpOutGetState())
+        // check if the input value is valid, then safe it
+        if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
-          // check if the input value is valid, then safe it
-          if(extractedValueInt == 1 || extractedValueInt == 0 )
-          {
-            //turn ON or OFF
-            if(extractedValueInt == 1) relaySwitchPumpOutTurnOn();
-            else relaySwitchPumpOutTurnOff(); // if extractedValueInt = 0
-            if(DEBUG)Serial.println("PumpOut has been set to a new state.");
-          }
-          else
-          {
-            if(DEBUG)Serial.println("WARNING: PumpOut state is invalid!.");
-          }
+          //turn ON or OFF
+          if(extractedValueInt == 1) relaySwitchPumpOutTurnOn();
+          else relaySwitchPumpOutTurnOff(); // if extractedValueInt = 0
+          if(DEBUG)Serial.println("PumpOut has been set to a new state.");
         }
-        else if(DEBUG)Serial.println("PumpOut state is the same as the saved one.");
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: PumpOut state is invalid!.");
+        }
       }
-      else Serial.println("ERROR: The term 'pumpOut:' couldn't have been found in the JSON command string. Please verify the command string.");
+      else if(DEBUG)Serial.println("PumpOut state is the same as the saved one.");
     }
     else if(DEBUG) Serial.println("Not in MANUAL mode: PumpOut's value not taken");
   } 
@@ -727,12 +635,69 @@ void ethernetParseCommandValue(char *fieldName, double fieldValue)
 
   }   
   else if (strcmp(fieldName,"carbonDioxide")==0) {
+    //---------Set gas valve (carbonDioxide) state ----------
+    // only get the pump's state if in MANUAL mode
+    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    {
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != gasValvesCO2GetState())
+      {
+        // check if the input value is valid, then safe it
+        if(extractedValueInt == 1 || extractedValueInt == 0 )
+        {
+          //turn ON or OFF
+          if(extractedValueInt == 1) gasValvesCO2TurnOn();
+          else gasValvesCO2TurnOff(); // if extractedValueInt = 0
+          if(DEBUG)Serial.println("The gas valve (carbonDioxide) has been set to a new state.");
+        }
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: The gas valve (carbonDioxide) state is invalid!.");
+        }
+      }
+      else if(DEBUG)Serial.println("The gas valve (carbonDioxide) state is the same as the saved one.");
+
+
+    }
+    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
 
   } 
   else if (strcmp(fieldName,"nitrogen")==0) {
 
+    //---------Set gas valve (nitrogen) state ----------
+    // only get the pump's state if in MANUAL mode
+    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    {
+
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != gasValvesN2GetState())
+      {
+        // check if the input value is valid, then safe it
+        if(extractedValueInt == 1 || extractedValueInt == 0 )
+        {
+          //turn ON or OFF
+          if(extractedValueInt == 1) gasValvesN2TurnOn();
+          else gasValvesN2TurnOff(); // if extractedValueInt = 0
+          if(DEBUG)Serial.println("The gas valve (nitrogen) has been set to a new state.");
+        }
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: The gas valve (nitrogen) state is invalid!.");
+        }
+      }
+      else if(DEBUG)Serial.println("The gas valve (nitrogen) state is the same as the saved one.");
+
+
+    }
+
+    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
+
+
   } 
 }
+
+
+
 
 
 
