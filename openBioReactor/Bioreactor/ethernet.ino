@@ -486,30 +486,34 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
 
   } 
   else if (strcmp(fieldName,"waitTime")==0) {
+    // Value read from WebUI is in min; the timer uses millisec!
     if(extractedValueInt != WAIT_TIME_BEFORE_PUMPING_OUT)
     {
       // check if the input value is valid, then safe it
-      if(extractedValueInt > WAIT_TIME_BEFORE_PUMPING_OUT_MAX)
+      if(extractedValueInt * MIN_TO_SEC > WAIT_TIME_BEFORE_PUMPING_OUT_MAX) // min und max values in [sec]!
       {
-        if(DEBUG)Serial.print("WARNING: The Wait Time is to high! Maximum allowed Wait Time is [millisec]:");
+        if(DEBUG)Serial.print("WARNING: The Wait Time is to high! Maximum allowed Wait Time is [sec]:");
         if(DEBUG)Serial.println(WAIT_TIME_BEFORE_PUMPING_OUT_MAX);
       }
-      else if (extractedValueInt < WAIT_TIME_BEFORE_PUMPING_OUT_MIN)
+      else if (extractedValueInt * MIN_TO_SEC < WAIT_TIME_BEFORE_PUMPING_OUT_MIN)
       {
-        if(DEBUG)Serial.print("WARNING: The Wait Time is to low! Minimum allowed Wait Time is [millisec]:");
+        if(DEBUG)Serial.print("WARNING: The Wait Time is to low! Minimum allowed Wait Time is [sec]:");
         if(DEBUG)Serial.println(WAIT_TIME_BEFORE_PUMPING_OUT_MIN);
       }
       else
       {
-        WAIT_TIME_BEFORE_PUMPING_OUT = extractedValueInt;
+        WAIT_TIME_BEFORE_PUMPING_OUT = extractedValueInt; //in [min]
+        PUMPING_OUT_TIMER = WAIT_TIME_BEFORE_PUMPING_OUT * MIN_TO_SEC * SEC_TO_MILLISEC; // in [millisec]
+        timerPumpingOut.setInterval(PUMPING_OUT_TIMER); 
         if(DEBUG)Serial.print("The new Wait Time has been successfully set to [millisec]: ");
-        if(DEBUG)Serial.println(WAIT_TIME_BEFORE_PUMPING_OUT);
+        if(DEBUG)Serial.println(PUMPING_OUT_TIMER);
       }
     }
     else if(DEBUG)Serial.println("The Wait Time is the same as the saved one.");
   } 
   else if (strcmp(fieldName,"methaneIn")==0) {
-
+    
+    
   } 
   else if (strcmp(fieldName,"carbonDioxideIn")==0) {
 
@@ -639,14 +643,14 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     {
 
       // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesCH4GetState())
+      if(extractedValueInt != gasValvesGetState(CH4))
       {
         // check if the input value is valid, then safe it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesCH4TurnOn();
-          else gasValvesCH4TurnOff(); // if extractedValueInt = 0
+          if(extractedValueInt == 1) gasValvesTurnOn(CH4);
+          else gasValvesTurnOff(CH4); // if extractedValueInt = 0
           if(DEBUG)Serial.println("The gas valve (methane) has been set to a new state.");
         }
         else
@@ -665,14 +669,14 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
     {
       // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesCO2GetState())
+      if(extractedValueInt != gasValvesGetState(CO2))
       {
         // check if the input value is valid, then safe it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesCO2TurnOn();
-          else gasValvesCO2TurnOff(); // if extractedValueInt = 0
+          if(extractedValueInt == 1) gasValvesTurnOn(CO2);
+          else gasValvesTurnOff(CO2); // if extractedValueInt = 0
           if(DEBUG)Serial.println("The gas valve (carbonDioxide) has been set to a new state.");
         }
         else
@@ -695,14 +699,14 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     {
 
       // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesN2GetState())
+      if(extractedValueInt != gasValvesGetState(N2))
       {
         // check if the input value is valid, then safe it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesN2TurnOn();
-          else gasValvesN2TurnOff(); // if extractedValueInt = 0
+          if(extractedValueInt == 1) gasValvesTurnOn(N2);
+          else gasValvesTurnOff(N2); // if extractedValueInt = 0
           if(DEBUG)Serial.println("The gas valve (nitrogen) has been set to a new state.");
         }
         else
