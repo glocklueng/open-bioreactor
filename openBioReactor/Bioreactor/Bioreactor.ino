@@ -25,8 +25,10 @@
 #define BIOREACTOR_PUMPING_MODE 3
 #define BIOREACTOR_ERROR_MODE 99
 
-#define WAIT_TIME_BEFORE_PUMPING_OUT_MIN 2000 // 2 sec
-#define WAIT_TIME_BEFORE_PUMPING_OUT_MAX 3600000//1 hour = 60*60*1000 milisec
+#define WAIT_TIME_BEFORE_PUMPING_OUT_MIN 60 // in [sec]
+#define WAIT_TIME_BEFORE_PUMPING_OUT_MAX 3600//in [sec]; 1 hour ; stack overflow if unsigned long used
+#define SEC_TO_MILLISEC 1000 // in order to obtain millisec (required by timer) 
+#define MIN_TO_SEC 60
 
 //----------CONSTANTS-HEATING---------
 #define PIN_HEATING_RESISTANCE 28//or 7 if on PWM
@@ -55,6 +57,14 @@
 #define PIN_GAS_CO2 38 //carbonDioxide
 #define PIN_GAS_N2 37 //nitrogen
 
+#define OFF 0
+#define ON 1
+#define PWM_MODE 2
+#define CH4 0
+#define CO2 1
+#define N2 2
+#define ALL 5
+
 
 //----------CONSTANTS-PH-METER--------- 
 #define PIN_PH_METER A1
@@ -79,13 +89,15 @@ float LIQUID_LEVEL_WEB_MAX; // in arduino AD-intervals [0;1023]
 float LIQUID_LEVEL_WEB_MIN;
 float pH_SET;
 int BIOREACTOR_MODE;
-int WAIT_TIME_BEFORE_PUMPING_OUT = 5000; // in [milisec] exceptional definition: because of timer declaration
+unsigned long WAIT_TIME_BEFORE_PUMPING_OUT; // in [min]
+unsigned long PUMPING_OUT_TIMER = 5000; // in [millisec] exceptional definition: because of timer declaration
+
 int bioreactorAncientMode; // variable to detect a unique modechange
 
 
 //----------TIMER DECLARATION--------- 
-TimedAction timerUpdateSensors = TimedAction(10000,globalUpdateSensors); // value is in milisec
-TimedAction timerPumpingOut = TimedAction(WAIT_TIME_BEFORE_PUMPING_OUT,relaySwitchPumpOutTurnOn); //wait a predefined (by WebUI) time before pumping out (for the sedimentation of bacterias)
+TimedAction timerUpdateSensors = TimedAction(10000,globalUpdateSensors); // value is in millisec
+TimedAction timerPumpingOut = TimedAction(PUMPING_OUT_TIMER,relaySwitchPumpOutTurnOn); //wait a predefined (by WebUI) time before pumping out (for the sedimentation of bacterias)
 TimedAction timerGetCommandPushLog = TimedAction(7000,globalGetCommandAndPushLog);
 TimedAction timerSyncNTP = TimedAction(3600000,ethernetSyncNTPTime); // sync NTP time from server every hour
 
@@ -212,9 +224,7 @@ void loop()
       relaySwitchMotorTurnOff();
       relaySwitchPumpOutTurnOff();
       relaySwitchPumpInTurnOff();
-      gasValvesCH4TurnOff();
-      gasValvesCO2TurnOff();
-      gasValvesN2TurnOff();
+      gasValvesTurnOff(ALL);
       break;
 
     case BIOREACTOR_RUNNING_MODE: 
@@ -229,9 +239,7 @@ void loop()
       //stop the motor for the stearing
       relaySwitchMotorTurnOff();
       relaySwitchPumpInTurnOff();
-      gasValvesCH4TurnOff();
-      gasValvesCO2TurnOff();
-      gasValvesN2TurnOff(); 
+      gasValvesTurnOff(ALL);
       // turn on PumpOut after a predefined amount of time; done in the MAIN Bioreactor Switch
       timerPumpingOut.enable();
       timerPumpingOut.reset();
@@ -246,9 +254,7 @@ void loop()
       //stop EVERYTHING
       relaySwitchMotorTurnOff();
       relaySwitchPumpInTurnOff();
-      gasValvesCH4TurnOff();
-      gasValvesCO2TurnOff();
-      gasValvesN2TurnOff(); 
+      gasValvesTurnOff(ALL);
       //stop the heating and don't execute the PID algorithm
       digitalWrite(PIN_HEATING_RESISTANCE,LOW); //Heating is OFF       
       break;
@@ -262,6 +268,7 @@ void loop()
 
 
 }
+
 
 
 
