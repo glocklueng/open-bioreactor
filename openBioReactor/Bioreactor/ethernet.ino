@@ -658,7 +658,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
           if(DEBUG)Serial.println("WARNING: The gas valve (methane) state is invalid!.");
         }
       }
-      else Serial.println("ERROR: The term 'methane:' couldn't have been found in the JSON command string. Please verify the command string.");
+       else if(DEBUG)Serial.println("The gas valve (methane) state is the same as the saved one.");
     }
     else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
     
@@ -684,7 +684,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
           if(DEBUG)Serial.println("WARNING: The gas valve (carbonDioxide) state is invalid!.");
         }
       }
-      else if(DEBUG)Serial.println("The gas valve (carbonDioxide) state is the same as the saved one.");
+     
 
 
     }
