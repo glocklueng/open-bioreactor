@@ -43,12 +43,12 @@ void gasValvesTurnOff(int gasValveID)
      case CO2:
        digitalWrite(gasValve[gasValveID].arduinoPin, LOW);
        gasValve[gasValveID].state = OFF;
-       if(DEBUG)Serial.println("Gas valve for CH4 has been turned off.");
+       if(DEBUG)Serial.println("Gas valve for CO2 has been turned off.");
        break;
      case N2:
        digitalWrite(gasValve[gasValveID].arduinoPin, LOW);
        gasValve[gasValveID].state = OFF;
-       if(DEBUG)Serial.println("Gas valve for CH4 has been turned off.");
+       if(DEBUG)Serial.println("Gas valve for N2 has been turned off.");
        break;
      case ALL:
        digitalWrite(gasValve[CH4].arduinoPin, LOW);
@@ -79,12 +79,12 @@ void gasValvesTurnOn(int gasValveID)
      case CO2:
        digitalWrite(gasValve[gasValveID].arduinoPin, HIGH);
        gasValve[gasValveID].state = ON;
-       if(DEBUG)Serial.println("Gas valve for CH4 has been turned on.");
+       if(DEBUG)Serial.println("Gas valve for CO2 has been turned on.");
        break;
      case N2:
        digitalWrite(gasValve[gasValveID].arduinoPin, HIGH);
        gasValve[gasValveID].state = ON;
-       if(DEBUG)Serial.println("Gas valve for CH4 has been turned on.");
+       if(DEBUG)Serial.println("Gas valve for N2 has been turned on.");
        break;
      case ALL:
        digitalWrite(gasValve[CH4].arduinoPin, HIGH);
