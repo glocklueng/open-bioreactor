@@ -59,7 +59,7 @@
 
 #define OFF 0
 #define ON 1
-#define PWM_MODE 2
+#define AUTOSWITCH_MODE 2
 #define CH4 0
 #define CO2 1
 #define N2 2
