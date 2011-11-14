@@ -401,7 +401,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     // (because floats are used, an error value of 0.05 has been set!)
     if(HEATING_TEMPERATURE_LIMIT >= extractedValueFloat + 0.05 || HEATING_TEMPERATURE_LIMIT <= extractedValueFloat-0.05)
     {
-      // check if the input value is valid, then safe it
+      // check if the input value is valid, then save it
       if(extractedValueFloat > HEATING_MAX_ALLOWED_LIMIT)
       {
         if(DEBUG)Serial.println("WARNING: The input temperature is to high! New temperature value has not been set.");
@@ -422,7 +422,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   else if (strcmp(fieldName,"liquidLevelMax")==0) {
     if(extractedValueInt != LIQUID_LEVEL_WEB_MAX)
     {
-      // check if the input value is valid, then safe it
+      // check if the input value is valid, then save it
       if(extractedValueInt > LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL)
       {
         if(DEBUG)Serial.println("WARNING: The input liquid level is to high! New liquid value has not been set.");
@@ -443,7 +443,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   else if (strcmp(fieldName,"liquidLevelMin")==0) {
     if(extractedValueInt != LIQUID_LEVEL_WEB_MAX)
     {
-      // check if the input value is valid, then safe it
+      // check if the input value is valid, then save it
       if(extractedValueInt > LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL)
       {
         if(DEBUG)Serial.println("WARNING: The input liquid level is to high! New liquid value has not been set.");
@@ -466,7 +466,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     // (because floats are used, an error value of 0.05 has been set!)
     if(pH_SET >= extractedValueFloat+0.05 || pH_SET <= extractedValueFloat-0.05)
     {
-      // check if the input value is valid, then safe it
+      // check if the input value is valid, then save it
       if(extractedValueFloat > 14.0) // max pH level is 14
       {
         if(DEBUG)Serial.println("WARNING: The input pH level is to high! New pH value has not been set.");
@@ -489,7 +489,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     // Value read from WebUI is in min; the timer uses millisec!
     if(extractedValueInt != WAIT_TIME_BEFORE_PUMPING_OUT)
     {
-      // check if the input value is valid, then safe it
+      // check if the input value is valid, then save it
       if(extractedValueInt * MIN_TO_SEC > WAIT_TIME_BEFORE_PUMPING_OUT_MAX) // min und max values in [sec]!
       {
         if(DEBUG)Serial.print("WARNING: The Wait Time is to high! Maximum allowed Wait Time is [sec]:");
@@ -511,20 +511,46 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     }
     else if(DEBUG)Serial.println("The Wait Time is the same as the saved one.");
   } 
-  else if (strcmp(fieldName,"methaneIn")==0) {
+  else if (strcmp(fieldName,"methaneIn")==0) 
+  {
     
     
   } 
-  else if (strcmp(fieldName,"carbonDioxideIn")==0) {
+  else if (strcmp(fieldName,"carbonDioxideIn")==0) 
+  {
+    // values for auto-switching mode can only be changed in MANUAL mode, but are saved and used by AUTOMATIC mode
+    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    {
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != gasValvesGetAutoSwitchInterval(CO2)) 
+      {
+        // check if the input value is valid, then save it
+        if(extractedValueInt <=100 && extractedValueInt >= 0 )// min. value is 0% max. value is 100%
+        {
+          gasValvesSetAutoSwitchInterval(CO2, extractedValueInt);
+          gasValvesAutoSwitchMode();
+          if(DEBUG)Serial.println("CO2 value's auto-switching parameter has been changed.");
+        }
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: CO2 value's auto-switching parameter is invalid!.");
+        }
+      }
+      else if(DEBUG)Serial.println("CO2 value's auto-switching parameter is the same as the saved one.");
+    }
+    else if(DEBUG) Serial.println("Not in MANUAL mode: CO2 value has not been switched to auto-switching mode");
 
   } 
-  else if (strcmp(fieldName,"nitrogenIn")==0) {
+  else if (strcmp(fieldName,"nitrogenIn")==0) 
+  {
 
   } 
-  else if (strcmp(fieldName,"liquidIn")==0) {
+  else if (strcmp(fieldName,"liquidIn")==0) 
+  {
 
   } 
-  else if (strcmp(fieldName,"liquidOut")==0) {
+  else if (strcmp(fieldName,"liquidOut")==0) 
+  {
 
   } 
   else if (strcmp(fieldName,"mode")==0) {
@@ -534,7 +560,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       && (BIOREACTOR_MODE != BIOREACTOR_PUMPING_MODE 
       || (BIOREACTOR_MODE == BIOREACTOR_PUMPING_MODE && extractedValueInt == BIOREACTOR_MANUAL_MODE)))
     {
-      // check if the input value is valid, then safe it
+      // check if the input value is valid, then save it
       if(extractedValueInt == BIOREACTOR_STANDBY_MODE
         || extractedValueInt == BIOREACTOR_RUNNING_MODE
         || extractedValueInt == BIOREACTOR_MANUAL_MODE)
@@ -563,7 +589,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != relaySwitchPumpOutGetState())
       {
-        // check if the input value is valid, then safe it
+        // check if the input value is valid, then save it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
@@ -589,7 +615,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != relaySwitchPumpInGetState())
       {
-        // check if the input value is valid, then safe it
+        // check if the input value is valid, then save it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
@@ -617,7 +643,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != relaySwitchMotorGetState())
       {
-        // check if the input value is valid, then safe it
+        // check if the input value is valid, then save it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
@@ -645,7 +671,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != gasValvesGetState(CH4))
       {
-        // check if the input value is valid, then safe it
+        // check if the input value is valid, then save it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
@@ -671,7 +697,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != gasValvesGetState(CO2))
       {
-        // check if the input value is valid, then safe it
+        // check if the input value is valid, then save it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF
@@ -701,7 +727,7 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != gasValvesGetState(N2))
       {
-        // check if the input value is valid, then safe it
+        // check if the input value is valid, then save it
         if(extractedValueInt == 1 || extractedValueInt == 0 )
         {
           //turn ON or OFF

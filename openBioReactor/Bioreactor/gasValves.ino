@@ -2,11 +2,13 @@ void gasValvesSetup();
 void gasValvesTurnOff(int gasValveID);
 void gasValvesTurnOn(int gasValveID);
 int gasValvesGetState(int gasValveID);
-
+int gasValvesGetAutoSwitchInterval(int gasValveID);
+void gasValvesSetAutoSwitchInterval(int gasValveID, int percent);
+void gasValvesAutoSwitchMode();
 
 
 struct gasValveStruct { int state;
-                        unsigned long pwmInterval; // in [milisec]
+                        int autoSwitchInterval; // in [%] percent [0:100]
                         int arduinoPin;  
                        };
 
@@ -19,13 +21,13 @@ void gasValvesSetup()
    pinMode(PIN_GAS_N2, OUTPUT);
    
    gasValve[CH4].state = OFF;
-   gasValve[CH4].pwmInterval = 0; // 0 milisec
+   gasValve[CH4].autoSwitchInterval = 0; // percent
    gasValve[CH4].arduinoPin = PIN_GAS_CH4;
    gasValve[CO2].state = OFF;
-   gasValve[CO2].pwmInterval = 0;
+   gasValve[CO2].autoSwitchInterval = 0;
    gasValve[CO2].arduinoPin = PIN_GAS_CO2;
    gasValve[N2].state = OFF;
-   gasValve[N2].pwmInterval = 0;
+   gasValve[N2].autoSwitchInterval = 0;
    gasValve[N2].arduinoPin = PIN_GAS_N2;
    
 }
@@ -106,20 +108,45 @@ void gasValvesTurnOn(int gasValveID)
 
 int gasValvesGetState(int gasValveID)
 {
-  switch (gasValveID)
-   {
-     case CH4:
-       return gasValve[gasValveID].state;
-     case CO2:
-       return gasValve[gasValveID].state;
-     case N2:
-       return gasValve[gasValveID].state;
-         
-     default:
-       Serial.println("ERROR: Invalid Gas valve ID! Gas valve's state cannot be returned.");
-       return -1;
-   }
-    
+  if (gasValveID == (CH4 || CO2 || N2))
+  {
+    return gasValve[gasValveID].state;
+  }
+  else
+  {
+    Serial.println("ERROR: Invalid Gas valve ID! Gas valve's state cannot be returned.");
+    return -1;   
+  }    
 }
 
+
+int gasValvesGetAutoSwitchInterval(int gasValveID) // GET
+{
+  if (gasValveID == (CH4 || CO2 || N2))
+  {
+    return gasValve[gasValveID].autoSwitchInterval;
+  }
+  else
+  {
+    Serial.println("ERROR: Invalid Gas valve ID!Gas valve's AutoSwitchInterval cannot be returned.");
+    return -1;   
+  }    
+}
+
+
+
+
+void gasValvesSetAutoSwitchInterval(int gasValveID, int percent) // SET
+{
+    if (gasValveID == (CH4 || CO2 || N2))
+    {
+      gasValve[gasValveID].autoSwitchInterval = percent;
+    }
+    else Serial.println("ERROR: Invalid Gas valve ID! Gas valve's AutoSwitchInterval cannot be saved.");
+}
+
+void gasValvesAutoSwitchMode()
+{
+    if(DEBUG)Serial.println("Gas valves auto-switching mode is being called successfully.");
+}
 
