@@ -168,15 +168,18 @@ void loop()
   case BIOREACTOR_RUNNING_MODE: 
     heatingRetulatePIDControl();
     //automatic program
-    if(liquidLevelGet()>=LIQUID_LEVEL_WEB_MAX)
-    { 
-      // ask two times, to avoid artefacts (measurement errors)
-      globalUpdateSensors();
-      if(liquidLevelGet()>=LIQUID_LEVEL_WEB_MAX) 
-      { 
-        BIOREACTOR_MODE = BIOREACTOR_PUMPING_MODE;  
-      } 
-    }
+    
+// UNCOMMENTED FOR DEBUGGING PURPOSES    
+//    if(liquidLevelGet()>=LIQUID_LEVEL_WEB_MAX)
+//    { 
+//      // ask two times, to avoid artefacts (measurement errors)
+//      globalUpdateSensors();
+//      if(liquidLevelGet()>=LIQUID_LEVEL_WEB_MAX) 
+//      { 
+//        BIOREACTOR_MODE = BIOREACTOR_PUMPING_MODE;  
+//      } 
+//    }
+
     gasValvesCheck();
     break;
 
