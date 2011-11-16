@@ -21,23 +21,32 @@ struct gasValveStruct gasValve[3];
 
 void gasValvesSetup()
 {
+   if(DEBUG)Serial.println("Initializing gas Valves...");
    pinMode(PIN_GAS_CH4, OUTPUT);
    pinMode(PIN_GAS_CO2, OUTPUT);
    pinMode(PIN_GAS_N2, OUTPUT);
    
-   gasValve[CH4].state = OFF;
-   gasValve[CH4].autoSwitchInterval = 0; // percent
-   gasValve[CH4].autoSwitchFlag = false;
+  /*Note: as defined in main: 
+  #define CH4 0
+  #define CO2 1
+  #define N2 2
+  */
+   
+   for(int i=0; i<=2; i++)
+   {
+    gasValve[i].state = OFF;
+    gasValve[i].autoSwitchInterval = 0; // percent 
+    gasValve[i].autoSwitchFlag = false;     
+    gasValve[i].autoSwitchState = OFF;
+    gasValve[i].timestampOn = millis();
+    gasValve[i].timestampOff = millis(); 
+   }
+   
    gasValve[CH4].arduinoPin = PIN_GAS_CH4;
-   gasValve[CO2].state = OFF;
-   gasValve[CO2].autoSwitchInterval = 0;
-   gasValve[CO2].autoSwitchFlag = false;
    gasValve[CO2].arduinoPin = PIN_GAS_CO2;
-   gasValve[N2].state = OFF;
-   gasValve[N2].autoSwitchInterval = 0;
-   gasValve[N2].autoSwitchFlag = false;
    gasValve[N2].arduinoPin = PIN_GAS_N2;
    
+   if(DEBUG)Serial.println("Gas Valves succesfully initialized.");
 }
 
 
@@ -211,6 +220,7 @@ void gasValvesAutoSwitchMode(int gasValveID)
 // this function is called as well by the main Bioreactor loop
 void gasValvesCheck()
 {
+  if(DEBUG)Serial.println("Checking gas valves for auto-switching mode.");
   unsigned long nowCheck;
   unsigned long offDuration;
   unsigned long onDuration;
@@ -222,8 +232,9 @@ void gasValvesCheck()
   #define N2 2
   */
   
-  for(int i=0; i=2; i++)
+  for(int i=0; i<=2; i++)
   {
+      if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. In FOR-loop");
     if(gasValve[i].autoSwitchFlag == true)
     {
       onDuration = gasValve[i].autoSwitchInterval * timeInterval;
@@ -232,6 +243,7 @@ void gasValvesCheck()
       
       if((gasValve[i].autoSwitchState == ON) && ((nowCheck - gasValve[i].timestampOn) >= onDuration))
       {
+        if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. In autoSwitchState == ON state");
         digitalWrite(gasValve[i].arduinoPin, LOW); //switch off
         gasValve[i].autoSwitchState = OFF;
         if(DEBUG)
@@ -248,6 +260,7 @@ void gasValvesCheck()
             
       if((gasValve[i].autoSwitchState == OFF) && ((nowCheck - gasValve[i].timestampOff) >= offDuration))
       {
+        if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. In autoSwitchState == OFF state");
         digitalWrite(gasValve[i].arduinoPin, HIGH); //switch on
         gasValve[i].autoSwitchState = ON;
         if(DEBUG)
