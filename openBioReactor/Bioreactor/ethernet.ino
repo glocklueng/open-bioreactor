@@ -518,27 +518,24 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   } 
   else if (strcmp(fieldName,"carbonDioxideIn")==0) 
   {
-    // values for auto-switching mode can only be changed in MANUAL mode, but are saved and used by AUTOMATIC mode
-    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    // values for auto-switching mode can be changed in any mode but the error-mode
+    if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
     {
       // first check if there is a difference between the read value and the stored one
       if(extractedValueInt != gasValvesGetAutoSwitchInterval(CO2)) 
       {
-        // check if the input value is valid, then save it
-        if(extractedValueInt <=100 && extractedValueInt >= 0 )// min. value is 0% max. value is 100%
-        {
           gasValvesSetAutoSwitchInterval(CO2, extractedValueInt);
-          gasValvesAutoSwitchMode();
+          gasValvesAutoSwitchMode(CO2);
           if(DEBUG)Serial.println("CO2 value's auto-switching parameter has been changed.");
-        }
-        else
+        // check if the input value is valid, then save it
+        if(extractedValueInt > 100 && extractedValueInt < 0 )// min. value is 0% max. value is 100%
         {
-          if(DEBUG)Serial.println("WARNING: CO2 value's auto-switching parameter is invalid!.");
+          Serial.println("WARNING: CO2 value's auto-switching parameter is invalid!.");
         }
       }
       else if(DEBUG)Serial.println("CO2 value's auto-switching parameter is the same as the saved one.");
     }
-    else if(DEBUG) Serial.println("Not in MANUAL mode: CO2 value has not been switched to auto-switching mode");
+    else if(DEBUG) Serial.println("WARNING: In ERROR-MODE: CO2 value has not been switched to auto-switching mode");
 
   } 
   else if (strcmp(fieldName,"nitrogenIn")==0) 

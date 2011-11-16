@@ -59,11 +59,10 @@
 
 #define OFF 0
 #define ON 1
-#define AUTOSWITCH_MODE 2
 #define CH4 0
 #define CO2 1
 #define N2 2
-#define ALL 5
+#define ALL 10
 
 
 //----------CONSTANTS-PH-METER--------- 
@@ -158,10 +157,12 @@ void loop()
   {
   case BIOREACTOR_MANUAL_MODE:  
     heatingRetulatePIDControl();
+    gasValvesCheck();
     break;  
 
   case BIOREACTOR_STANDBY_MODE: 
     //no heating
+    gasValvesCheck();
     break;
 
   case BIOREACTOR_RUNNING_MODE: 
@@ -176,7 +177,7 @@ void loop()
         BIOREACTOR_MODE = BIOREACTOR_PUMPING_MODE;  
       } 
     }
-
+    gasValvesCheck();
     break;
 
   case BIOREACTOR_PUMPING_MODE:// internal mode
@@ -193,7 +194,7 @@ void loop()
         timerPumpingOut.disable();      
       }
     }
-
+    gasValvesCheck();
     break;
 
   case BIOREACTOR_ERROR_MODE: 
@@ -243,8 +244,6 @@ void loop()
       // turn on PumpOut after a predefined amount of time; done in the MAIN Bioreactor Switch
       timerPumpingOut.enable();
       timerPumpingOut.reset();
-      //TODO: stop all inflow of gases
-
       //stop the heating and don't execute the PID algorithm
       digitalWrite(PIN_HEATING_RESISTANCE,LOW); //Heating is OFF  
       break;
