@@ -530,7 +530,8 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
         // check if the input value is valid, then save it
         if(extractedValueInt > 100 && extractedValueInt < 0 )// min. value is 0% max. value is 100%
         {
-          Serial.println("WARNING: CO2 value's auto-switching parameter is invalid!.");
+          Serial.print("WARNING: CO2 value's auto-switching parameter is invalid!. ");
+          Serial.println("It has been corrected to fit the min. [0] and max. [100] allowed values.");
         }
       }
       else if(DEBUG)Serial.println("CO2 value's auto-switching parameter is the same as the saved one.");
@@ -570,7 +571,8 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
       }
       else
       {
-        if(DEBUG)Serial.println("WARNING: The Bioreactor state is invalid!.");
+        if(DEBUG)Serial.print("WARNING: The Bioreactor state is invalid!. The state is: ");
+        if(DEBUG)Serial.println(extractedValueInt);
       }
     }
     else if(DEBUG)Serial.println("The Bioreactor state is the same as the saved one.");
