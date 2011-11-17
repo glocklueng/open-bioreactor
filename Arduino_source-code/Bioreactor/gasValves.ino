@@ -34,12 +34,12 @@ void gasValvesSetup()
 
   for(int i=0; i<=2; i++)
   {
-    gasValve[i].state = OFF;
+    gasValve[i].state = ON;
     gasValve[i].autoSwitchInterval = 0; // percent 
-    gasValve[i].autoSwitchFlag = false;     
-    gasValve[i].autoSwitchState = OFF;
+    gasValve[i].autoSwitchFlag = true;     
+    gasValve[i].autoSwitchState = ON;
     gasValve[i].timestampOn = 0;
-    gasValve[i].timestampOff = millis(); 
+    gasValve[i].timestampOff = 0; 
   }
 
   gasValve[CH4].arduinoPin = PIN_GAS_CH4;
@@ -238,7 +238,7 @@ void gasValvesCheck()
   {
     if(gasValve[i].autoSwitchFlag == true)
     {
-      onDuration = gasValve[i].autoSwitchInterval / 100 * timeInterval; // devide by 100 because the % is stored as INT
+      onDuration = gasValve[i].autoSwitchInterval * timeInterval / 100; // devide by 100 because the % is stored as INT
       offDuration = timeInterval - onDuration;
       nowCheck = millis();
     if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. Flag-ON & interval calculated.");
