@@ -125,6 +125,7 @@ void gasValvesTurnOn(int gasValveID)
 
 int gasValvesGetState(int gasValveID)
 {
+      Serial.println("Debug_8");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)
@@ -141,6 +142,7 @@ int gasValvesGetState(int gasValveID)
 
 int gasValvesGetAutoSwitchInterval(int gasValveID) // GET
 {
+      Serial.println("Debug_7");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)
@@ -159,6 +161,7 @@ int gasValvesGetAutoSwitchInterval(int gasValveID) // GET
 
 void gasValvesSetAutoSwitchInterval(int gasValveID, int percent) // SET
 {
+      Serial.println("Debug_6");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)    
@@ -186,6 +189,7 @@ void gasValvesSetAutoSwitchInterval(int gasValveID, int percent) // SET
 
 void gasValvesAutoSwitchMode(int gasValveID)
 {
+      Serial.println("Debug_5");
   //check if gas valve is turned on over WebUI
   //if so, put the gas valve in auto-switching mode and start the timing
   if(gasValve[gasValveID].state == ON)
@@ -217,6 +221,7 @@ void gasValvesAutoSwitchMode(int gasValveID)
 // this function is called as well by the main Bioreactor loop
 void gasValvesCheck()
 {
+      Serial.println("Debug_4");
   unsigned long nowCheck;
   unsigned long offDuration;
   unsigned long onDuration;
