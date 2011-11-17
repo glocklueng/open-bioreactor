@@ -706,93 +706,93 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     }
     else if(DEBUG) Serial.println("Not in MANUAL mode: Motor's value not taken");
   } 
-  else if (strcmp(fieldName,"methane")==0) {
-   //---------Set gas valve (methane) state ----------
-    // only get the pump's state if in MANUAL mode
-    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-    {
-
-      // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesGetState(CH4))
-      {
-        // check if the input value is valid, then save it
-        if(extractedValueInt == 1 || extractedValueInt == 0 )
-        {
-          //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesTurnOn(CH4);
-          else gasValvesTurnOff(CH4); // if extractedValueInt = 0
-          if(DEBUG)Serial.println("The gas valve (methane) has been set to a new state.");
-        }
-        else
-        {
-          if(DEBUG)Serial.println("WARNING: The gas valve (methane) state is invalid!.");
-        }
-      }
-       else if(DEBUG)Serial.println("The gas valve (methane) state is the same as the saved one.");
-    }
-    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
-    
-  }   
-  else if (strcmp(fieldName,"carbonDioxide")==0) {
-    //---------Set gas valve (carbonDioxide) state ----------
-    // only get the pump's state if in MANUAL mode
-    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-    {
-      // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesGetState(CO2))
-      {
-        // check if the input value is valid, then save it
-        if(extractedValueInt == 1 || extractedValueInt == 0 )
-        {
-          //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesTurnOn(CO2);
-          else gasValvesTurnOff(CO2); // if extractedValueInt = 0
-          if(DEBUG)Serial.println("The gas valve (carbonDioxide) has been set to a new state.");
-        }
-        else
-        {
-          if(DEBUG)Serial.println("WARNING: The gas valve (carbonDioxide) state is invalid!.");
-        }
-      }
-     
-
-
-    }
-    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
-
-  } 
-  else if (strcmp(fieldName,"nitrogen")==0) {
-
-    //---------Set gas valve (nitrogen) state ----------
-    // only get the pump's state if in MANUAL mode
-    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-    {
-
-      // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != gasValvesGetState(N2))
-      {
-        // check if the input value is valid, then save it
-        if(extractedValueInt == 1 || extractedValueInt == 0 )
-        {
-          //turn ON or OFF
-          if(extractedValueInt == 1) gasValvesTurnOn(N2);
-          else gasValvesTurnOff(N2); // if extractedValueInt = 0
-          if(DEBUG)Serial.println("The gas valve (nitrogen) has been set to a new state.");
-        }
-        else
-        {
-          if(DEBUG)Serial.println("WARNING: The gas valve (nitrogen) state is invalid!.");
-        }
-      }
-      else if(DEBUG)Serial.println("The gas valve (nitrogen) state is the same as the saved one.");
-
-
-    }
-
-    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
-
-
-  } 
+//  else if (strcmp(fieldName,"methane")==0) {
+//   //---------Set gas valve (methane) state ----------
+//    // only get the pump's state if in MANUAL mode
+//    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+//    {
+//
+//      // first check if there is a difference between the read value and the stored one
+//      if(extractedValueInt != gasValvesGetState(CH4))
+//      {
+//        // check if the input value is valid, then save it
+//        if(extractedValueInt == 1 || extractedValueInt == 0 )
+//        {
+//          //turn ON or OFF
+//          if(extractedValueInt == 1) gasValvesTurnOn(CH4);
+//          else gasValvesTurnOff(CH4); // if extractedValueInt = 0
+//          if(DEBUG)Serial.println("The gas valve (methane) has been set to a new state.");
+//        }
+//        else
+//        {
+//          if(DEBUG)Serial.println("WARNING: The gas valve (methane) state is invalid!.");
+//        }
+//      }
+//       else if(DEBUG)Serial.println("The gas valve (methane) state is the same as the saved one.");
+//    }
+//    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
+//    
+//  }   
+//  else if (strcmp(fieldName,"carbonDioxide")==0) {
+//    //---------Set gas valve (carbonDioxide) state ----------
+//    // only get the pump's state if in MANUAL mode
+//    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+//    {
+//      // first check if there is a difference between the read value and the stored one
+//      if(extractedValueInt != gasValvesGetState(CO2))
+//      {
+//        // check if the input value is valid, then save it
+//        if(extractedValueInt == 1 || extractedValueInt == 0 )
+//        {
+//          //turn ON or OFF
+//          if(extractedValueInt == 1) gasValvesTurnOn(CO2);
+//          else gasValvesTurnOff(CO2); // if extractedValueInt = 0
+//          if(DEBUG)Serial.println("The gas valve (carbonDioxide) has been set to a new state.");
+//        }
+//        else
+//        {
+//          if(DEBUG)Serial.println("WARNING: The gas valve (carbonDioxide) state is invalid!.");
+//        }
+//      }
+//     
+//
+//
+//    }
+//    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
+//
+//  } 
+//  else if (strcmp(fieldName,"nitrogen")==0) {
+//
+//    //---------Set gas valve (nitrogen) state ----------
+//    // only get the pump's state if in MANUAL mode
+//    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+//    {
+//
+//      // first check if there is a difference between the read value and the stored one
+//      if(extractedValueInt != gasValvesGetState(N2))
+//      {
+//        // check if the input value is valid, then save it
+//        if(extractedValueInt == 1 || extractedValueInt == 0 )
+//        {
+//          //turn ON or OFF
+//          if(extractedValueInt == 1) gasValvesTurnOn(N2);
+//          else gasValvesTurnOff(N2); // if extractedValueInt = 0
+//          if(DEBUG)Serial.println("The gas valve (nitrogen) has been set to a new state.");
+//        }
+//        else
+//        {
+//          if(DEBUG)Serial.println("WARNING: The gas valve (nitrogen) state is invalid!.");
+//        }
+//      }
+//      else if(DEBUG)Serial.println("The gas valve (nitrogen) state is the same as the saved one.");
+//
+//
+//    }
+//
+//    else if(DEBUG) Serial.println("Not in MANUAL mode: Gas valve's value not taken");
+//
+//
+//  } 
 }
 
 
