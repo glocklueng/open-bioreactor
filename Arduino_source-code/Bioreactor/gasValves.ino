@@ -38,7 +38,7 @@ void gasValvesSetup()
     gasValve[i].autoSwitchInterval = 0; // percent 
     gasValve[i].autoSwitchFlag = false;     
     gasValve[i].autoSwitchState = OFF;
-    gasValve[i].timestampOn = millis();
+    gasValve[i].timestampOn = 0;
     gasValve[i].timestampOff = millis(); 
   }
 
@@ -125,11 +125,12 @@ void gasValvesTurnOn(int gasValveID)
 
 int gasValvesGetState(int gasValveID)
 {
-      Serial.println("Debug_8");
+    Serial.println("Debug_8");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)
   {
+      Serial.println("Debug_9");
     return gasValve[gasValveID].state;
   }
   else
