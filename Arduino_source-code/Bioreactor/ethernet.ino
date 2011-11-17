@@ -513,6 +513,26 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   } 
   else if (strcmp(fieldName,"methaneIn")==0) 
   {
+    // values for auto-switching mode can be changed in any mode but the error-mode
+    if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
+    {
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != gasValvesGetAutoSwitchInterval(CH4)) 
+      {
+          gasValvesSetAutoSwitchInterval(CH4, extractedValueInt);
+          gasValvesAutoSwitchMode(CH4);
+          if(DEBUG)Serial.println("CH4 value's auto-switching parameter has been changed.");
+        // check if the input value is valid, then save it
+        if(extractedValueInt > 100 && extractedValueInt < 0 )// min. value is 0% max. value is 100%
+        {
+          Serial.print("WARNING: CH4 value's auto-switching parameter is invalid!. ");
+          Serial.println("It has been corrected to fit the min. [0] and max. [100] allowed values.");
+        }
+      }
+      else if(DEBUG)Serial.println("CH4 value's auto-switching parameter is the same as the saved one.");
+    }
+    else if(DEBUG) Serial.println("WARNING: In ERROR-MODE: CH4 value has not been switched to auto-switching mode");
+
     
     
   } 
@@ -540,8 +560,29 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
 
   } 
   else if (strcmp(fieldName,"nitrogenIn")==0) 
-  {
+  {    
+    // values for auto-switching mode can be changed in any mode but the error-mode
+    if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
+    {
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != gasValvesGetAutoSwitchInterval(N2)) 
+      {
+          gasValvesSetAutoSwitchInterval(N2, extractedValueInt);
+          gasValvesAutoSwitchMode(N2);
+          if(DEBUG)Serial.println("N2 value's auto-switching parameter has been changed.");
+        // check if the input value is valid, then save it
+        if(extractedValueInt > 100 && extractedValueInt < 0 )// min. value is 0% max. value is 100%
+        {
+          Serial.print("WARNING: N2 value's auto-switching parameter is invalid!. ");
+          Serial.println("It has been corrected to fit the min. [0] and max. [100] allowed values.");
+        }
+      }
+      else if(DEBUG)Serial.println("N2 value's auto-switching parameter is the same as the saved one.");
+    }
+    else if(DEBUG) Serial.println("WARNING: In ERROR-MODE: N2 value has not been switched to auto-switching mode");
 
+
+    
   } 
   else if (strcmp(fieldName,"liquidIn")==0) 
   {
