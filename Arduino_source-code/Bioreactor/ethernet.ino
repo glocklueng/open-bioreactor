@@ -514,7 +514,6 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   } 
   else if (strcmp(fieldName,"methaneIn")==0) 
   {
-    Serial.println("Debug_1");
     // values for auto-switching mode can be changed in any mode but the error-mode
     if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
     {
@@ -540,7 +539,6 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   } 
   else if (strcmp(fieldName,"carbonDioxideIn")==0) 
   {
-     Serial.println("Debug_2");
     // values for auto-switching mode can be changed in any mode but the error-mode
     if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
     {
@@ -564,7 +562,6 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   } 
   else if (strcmp(fieldName,"nitrogenIn")==0) 
   {    
-    Serial.println("Debug_3");
     // values for auto-switching mode can be changed in any mode but the error-mode
     if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
     {
