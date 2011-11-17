@@ -157,14 +157,17 @@ void loop()
   {
   case BIOREACTOR_MANUAL_MODE:  
     heatingRetulatePIDControl();
+    gasValvesCheck();
     break;  
 
   case BIOREACTOR_STANDBY_MODE: 
     //no heating
+    gasValvesCheck();
     break;
 
   case BIOREACTOR_RUNNING_MODE: 
     heatingRetulatePIDControl();
+    gasValvesCheck();
     //automatic program
     
 // UNCOMMENTED FOR DEBUGGING PURPOSES    

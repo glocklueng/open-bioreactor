@@ -40,10 +40,10 @@ void loggingEvent()
   notImplemented,
   notImplemented,
   relaySwitchMotorGetState(),
+  notImplemented,
   gasValvesGetAutoSwitchInterval(CH4),
   gasValvesGetAutoSwitchInterval(CO2),
   gasValvesGetAutoSwitchInterval(N2),
-  notImplemented,
   BIOREACTOR_MODE
     );
 
