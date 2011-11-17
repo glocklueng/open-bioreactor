@@ -157,12 +157,10 @@ void loop()
   {
   case BIOREACTOR_MANUAL_MODE:  
     heatingRetulatePIDControl();
-    gasValvesCheck();
     break;  
 
   case BIOREACTOR_STANDBY_MODE: 
     //no heating
-    gasValvesCheck();
     break;
 
   case BIOREACTOR_RUNNING_MODE: 
@@ -180,7 +178,6 @@ void loop()
 //      } 
 //    }
 
-    gasValvesCheck();
     break;
 
   case BIOREACTOR_PUMPING_MODE:// internal mode
@@ -197,7 +194,6 @@ void loop()
         timerPumpingOut.disable();      
       }
     }
-    gasValvesCheck();
     break;
 
   case BIOREACTOR_ERROR_MODE: 
