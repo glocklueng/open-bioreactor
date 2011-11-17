@@ -125,12 +125,10 @@ void gasValvesTurnOn(int gasValveID)
 
 int gasValvesGetState(int gasValveID)
 {
-    Serial.println("Debug_8");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)
   {
-      Serial.println("Debug_9");
     return gasValve[gasValveID].state;
   }
   else
@@ -143,7 +141,6 @@ int gasValvesGetState(int gasValveID)
 
 int gasValvesGetAutoSwitchInterval(int gasValveID) // GET
 {
-      Serial.println("Debug_7");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)
@@ -162,7 +159,6 @@ int gasValvesGetAutoSwitchInterval(int gasValveID) // GET
 
 void gasValvesSetAutoSwitchInterval(int gasValveID, int percent) // SET
 {
-      Serial.println("Debug_6");
   if (gasValveID == CH4
     || gasValveID == CO2
     || gasValveID == N2)    
@@ -190,7 +186,6 @@ void gasValvesSetAutoSwitchInterval(int gasValveID, int percent) // SET
 
 void gasValvesAutoSwitchMode(int gasValveID)
 {
-      Serial.println("Debug_5");
   //check if gas valve is turned on over WebUI
   //if so, put the gas valve in auto-switching mode and start the timing
   if(gasValve[gasValveID].state == ON)
@@ -222,7 +217,6 @@ void gasValvesAutoSwitchMode(int gasValveID)
 // this function is called as well by the main Bioreactor loop
 void gasValvesCheck()
 {
-      Serial.println("Debug_4");
   unsigned long nowCheck;
   unsigned long offDuration;
   unsigned long onDuration;
@@ -236,12 +230,25 @@ void gasValvesCheck()
 
   for(int i=0; i<=2; i++)
   {
+    //first check if the two extreme values have been saved in autoSwitchInterval (0 or 100%)
+    if(gasValve[i].autoSwitchInterval == 0)
+    {
+      digitalWrite(gasValve[i].arduinoPin, LOW); // turn off
+      gasValve[i].autoSwitchState = OFF;
+    }
+    else if (gasValve[i].autoSwitchInterval == 100)
+    {
+      digitalWrite(gasValve[i].arduinoPin, HIGH); // turn on
+      gasValve[i].autoSwitchState = ON;
+    }  
+
+
     if(gasValve[i].autoSwitchFlag == true)
     {
       onDuration = gasValve[i].autoSwitchInterval * timeInterval / 100; // devide by 100 because the % is stored as INT
       offDuration = timeInterval - onDuration;
       nowCheck = millis();
-    if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. Flag-ON & interval calculated.");
+      if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. Flag-ON & interval calculated.");
       if((gasValve[i].autoSwitchState == ON) && ((nowCheck - gasValve[i].timestampOn) >= onDuration))
       {
         if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. In autoSwitchState == ON state");
@@ -280,5 +287,6 @@ void gasValvesCheck()
 
 
 }
+
 
 
