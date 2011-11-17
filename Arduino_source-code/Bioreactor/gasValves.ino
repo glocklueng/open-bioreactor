@@ -217,7 +217,6 @@ void gasValvesAutoSwitchMode(int gasValveID)
 // this function is called as well by the main Bioreactor loop
 void gasValvesCheck()
 {
-  if(DEBUG)Serial.println("Checking gas valves for auto-switching mode.");
   unsigned long nowCheck;
   unsigned long offDuration;
   unsigned long onDuration;
@@ -231,13 +230,12 @@ void gasValvesCheck()
 
   for(int i=0; i<=2; i++)
   {
-    if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. In FOR-loop");
     if(gasValve[i].autoSwitchFlag == true)
     {
       onDuration = gasValve[i].autoSwitchInterval / 100 * timeInterval; // devide by 100 because the % is stored as INT
       offDuration = timeInterval - onDuration;
       nowCheck = millis();
-
+    if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. Flag-ON & interval calculated.");
       if((gasValve[i].autoSwitchState == ON) && ((nowCheck - gasValve[i].timestampOn) >= onDuration))
       {
         if(DEBUG)Serial.println("Checking gas valves for auto-switching mode. In autoSwitchState == ON state");
