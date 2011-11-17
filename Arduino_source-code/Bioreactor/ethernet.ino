@@ -78,6 +78,7 @@ void ethernetSetup()
   // the ethernet pin has been initialized in the main setup() from Bioreactor
   Ethernet.begin(mac,ip);
   Udp.begin(localPort);
+  Serial.println("Ethernet successfully initialized.");
 }
 
 
