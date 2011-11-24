@@ -233,17 +233,23 @@ void gasValvesCheck()
     //first check if the two extreme values have been saved in autoSwitchInterval (0 or 100%)
     if(gasValve[i].autoSwitchInterval == 0)
     {
-      digitalWrite(gasValve[i].arduinoPin, LOW); // turn off
+      if(digitalRead(gasValve[i].arduinoPin != LOW))
+      {
+        digitalWrite(gasValve[i].arduinoPin, LOW); // turn off
+      }
       gasValve[i].autoSwitchState = OFF;
     }
     else if (gasValve[i].autoSwitchInterval == 100)
     {
-      digitalWrite(gasValve[i].arduinoPin, HIGH); // turn on
+      if(digitalRead(gasValve[i].arduinoPin != HIGH))
+      {
+        digitalWrite(gasValve[i].arduinoPin, HIGH); // turn on      
+      }
       gasValve[i].autoSwitchState = ON;
     }  
 
 
-    if(gasValve[i].autoSwitchFlag == true)
+    else if(gasValve[i].autoSwitchFlag == true)
     {
       onDuration = gasValve[i].autoSwitchInterval * timeInterval / 100; // devide by 100 because the % is stored as INT
       offDuration = timeInterval - onDuration;
@@ -283,10 +289,11 @@ void gasValvesCheck()
         gasValve[i].timestampOn = nowCheck; // NOTE: timestampON!
       }//end of oFFDuration
     }
-  }
+  } // end of   for(int i=0; i<=2; i++)
 
 
 }
+
 
 
 
