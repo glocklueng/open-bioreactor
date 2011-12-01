@@ -51,6 +51,8 @@
 #define PIN_MOTOR 25
 #define PIN_PUMP_OUT 26
 #define PIN_PUMP_IN 27
+#define PUMP_IN 0
+#define PUMP_OUT 1
 
 //----------CONSTANTS-GAS-VALVES---------
 #define PIN_GAS_CH4 39 //methane; closest to the external power supply on the extension board
@@ -157,17 +159,17 @@ void loop()
   {
   case BIOREACTOR_MANUAL_MODE:  
     heatingRetulatePIDControl();
-    gasValvesCheck();
+    globalCheck();
     break;  
 
   case BIOREACTOR_STANDBY_MODE: 
     //no heating
-    gasValvesCheck();
+    globalCheck();
     break;
 
   case BIOREACTOR_RUNNING_MODE: 
     heatingRetulatePIDControl();
-    gasValvesCheck();
+    globalCheck();
     //automatic program
     
 // UNCOMMENTED FOR DEBUGGING PURPOSES    
