@@ -35,9 +35,7 @@ void gasValvesSetup()
   for(int i=0; i<=2; i++)
   {
     gasValve[i].state = ON;
-    gasValve[i].autoSwitchInterval = 0; // percent 
-    gasValve[i].autoSwitchFlag = true;     
-    gasValve[i].autoSwitchState = ON;
+    gasValve[i].autoSwitchInterval = 0; // percent
     gasValve[i].timestampOn = 0;
     gasValve[i].timestampOff = 0; 
   }
@@ -151,8 +149,7 @@ int gasValvesGetAutoSwitchInterval(int gasValveID) // GET
   {
     Serial.println("ERROR: Invalid gas valve ID! Gas valve's AutoSwitchInterval cannot be returned.");
     return -1;   
-  }    
-}
+  }    }
 
 
 
