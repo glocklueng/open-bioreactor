@@ -1,4 +1,4 @@
-void relaySwitchMotorSetup();
+void relaySwitchSetup();
 void relaySwitchMotorTurnOff();
 void relaySwitchMotorTurnOn();
 int relaySwitchMotorGetState();
@@ -7,9 +7,9 @@ void relaySwitchPumpOutTurnOff();
 void relaySwitchPumpOutTurnOn();
 void relaySwitchPumpInTurnOff();
 void relaySwitchPumpInTurnOn();
-
-int relaySwitchPumpGetState(int pumpID);
+int relaySwitchPumpGetAutoSwitchInterval(int pumpID);
 void relaySwitchPumpSetAutoSwitchInterval(int pumpID, int percent);
+//int relaySwitchPumpGetState(int pumpID);
 void relaySwitchAutoSwitchMode(int pumpID);
 void relaySwitchCheck();
 
