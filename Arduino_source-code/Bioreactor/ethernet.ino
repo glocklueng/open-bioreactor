@@ -647,8 +647,9 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     }
     else if(DEBUG) Serial.println("Not in MANUAL mode: PumpOut's value not taken");
   } 
+  
+  
   else if (strcmp(fieldName,"pumpIn")==0) {
-
     //---------Set pumpIn state ----------
     // only get the pump's state if in MANUAL mode
     if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
@@ -673,9 +674,10 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     }
     else if(DEBUG) Serial.println("Not in MANUAL mode: PumpIn's value not taken");
   } 
+  
+  
   else if (strcmp(fieldName,"motor")==0) {
-
-    //---------Set motor state ----------
+  //---------Set motor state ----------
     // only get the motor's state if in MANUAL mode
     if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
     {

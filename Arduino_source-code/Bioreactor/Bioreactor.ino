@@ -43,7 +43,7 @@
 #define LIQUID_LEVEL_PHYSICAL_MAX 8.6f //in inch
 #define LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL 1023 //Arduino interval from 0 to 1023
 #define LIQUID_LEVEL_PHYSICAL_MIN_INTERVAL 0
-#define PIN_FLOAT_MAX A3
+#define PIN_FLOAT_MAX A3 // for the floater
 #define PIN_FLOAT_MIN A4
 
 //----------CONSTANTS-LOGGING---------  
@@ -121,7 +121,6 @@ void setup()
   loggingSetup();
   ethernetSetup();
   //sdCardSetup();
-  floatSetup();
 
 
   //setup the global variables
@@ -173,12 +172,11 @@ void loop()
     gasValvesCheck();
     //automatic program
     
-// UNCOMMENTED FOR DEBUGGING PURPOSES    
-    if(floatMaxGet() == 0 && floatMinGet() == 1)
+    if(liquidLevelFloatMaxGet() == 0)
     { 
       // ask two times, to avoid artefacts (measurement errors)
       globalUpdateSensors();
-      if(floatMaxGet()== 0 && floatMinGet() == 1) 
+      if(liquidLevelFloatMaxGet()== 0) 
       { 
         BIOREACTOR_MODE = BIOREACTOR_PUMPING_MODE;  
       } 
@@ -190,11 +188,11 @@ void loop()
     //wait for for a predefined amount of minutes  
     //and turn on the perilstaltic pump on until a predefined liquid level has been reached    
     timerPumpingOut.check();
-    if(floatMaxGet()== 1 && floatMinGet() == 0)
+    if(liquidLevelFloatMinGet() == 0)
     {  
       // ask two times, to avoid artefacts (measurement errors)
       globalUpdateSensors();
-      if(floatMaxGet()== 1 && floatMinGet() == 0)
+      if(liquidLevelFloatMinGet() == 0)
       {  
         BIOREACTOR_MODE = BIOREACTOR_RUNNING_MODE;
         timerPumpingOut.disable();      
