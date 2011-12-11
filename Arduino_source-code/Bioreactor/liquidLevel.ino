@@ -1,6 +1,13 @@
 void liquidLevelUpdate();
 int liquidLevelGet();
-
+void floatSetup();
+void floatUpdate();
+void floatMaxRead();
+void floatMinRead();
+int floatMinGet();
+int floatMaxGet();
+int floatMaxValue;
+int floatMinValue;
 
 // Hight Vout values if reactor is empty
 // see eTape (PN-6573P-8) datasheet for more information
@@ -27,3 +34,47 @@ int liquidLevelGet()
   return liquidInterval;
 }
 
+void floatSetup()
+{
+ pinMode(PIN_FLOAT_MAX, INPUT);
+ pinMode(PIN_FLOAT_MIN, INPUT);
+  
+}
+
+void floatUpdate()
+{
+floatMaxRead();
+floatMinRead();
+
+}
+void floatMaxRead()
+{
+int floatMaxValue = digitalRead(PIN_FLOAT_MAX); //is 0 when float is up, 1 when down
+if(DEBUG)
+{
+  Serial.print("The floatMaxValue is: ");
+  Serial.println(floatMaxValue);
+}
+}
+
+void floatMinRead()
+{
+int floatMinValue = digitalRead(PIN_FLOAT_MIN); //is 1 when float is up, o when down
+if(DEBUG)
+{
+  Serial.print("The floatMinValue is: ");
+  Serial.println(floatMinValue);
+}
+}
+
+int floatMaxGet()
+{
+floatMaxRead();
+return floatMaxValue; 
+}  
+
+int floatMinGet()
+{
+floatMinRead();  
+return floatMinValue; 
+}  

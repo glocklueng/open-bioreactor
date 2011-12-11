@@ -1,6 +1,5 @@
 void globalFloatToStringDouble(double val, byte precision, char *buf, unsigned bufLen = 0xffff);
 void globalGetCommandAndPushLog();
-void globalCheck();
 //boolean globalSelectSDCard();
 //boolean globalSelectEthernet();
 
@@ -9,7 +8,8 @@ void globalUpdateSensors()
 {
   temperatureUpdate();
   pHmeterUpdate();
-  liquidLevelUpdate();  
+  liquidLevelUpdate();
+  floatUpdate();  
 }
 
 void globalGetCommandAndPushLog()
@@ -20,12 +20,6 @@ void globalGetCommandAndPushLog()
   loggingEvent();  
 }
 
-void globalCheck()
-{
-  // check always while being in main loop
-  gasValvesCheck();
-  relaySwitchCheck();
-}
 
 
 //boolean globalSelectSDCard()
