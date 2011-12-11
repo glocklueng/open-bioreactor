@@ -9,7 +9,7 @@ void globalUpdateSensors()
   temperatureUpdate();
   pHmeterUpdate();
   liquidLevelUpdate();
-  floatUpdate();  
+  liquidLevelFloatUpdate();  
 }
 
 void globalGetCommandAndPushLog()
