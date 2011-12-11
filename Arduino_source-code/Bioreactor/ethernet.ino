@@ -587,53 +587,12 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
   } 
   else if (strcmp(fieldName,"liquidIn")==0) 
   {
-    // values for auto-switching mode can be changed in any mode but the error-mode
-    if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
-    {
-      // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != relaySwitchPumpGetAutoSwitchInterval(PUMP_IN)) 
-      {
-          relaySwitchPumpSetAutoSwitchInterval(PUMP_IN, extractedValueInt);
-          relaySwitchAutoSwitchMode(PUMP_IN);
-          if(DEBUG)Serial.println("Pump-IN value's auto-switching parameter has been changed.");
-        // check if the input value is valid, then save it
-        if(extractedValueInt > 100 && extractedValueInt < 0 )// min. value is 0% max. value is 100%
-        {
-          Serial.print("WARNING: Pump-IN value's auto-switching parameter is invalid!. ");
-          Serial.println("It has been corrected to fit the min. [0] and max. [100] allowed values.");
-        }
-      }
-      else if(DEBUG)Serial.println("Pump-IN value's auto-switching parameter is the same as the saved one.");
-    }
-    else if(DEBUG) Serial.println("WARNING: In ERROR-MODE: Pump-IN value has not been switched to auto-switching mode");
-      
+
   } 
-  
   else if (strcmp(fieldName,"liquidOut")==0) 
-    {
-    // values for auto-switching mode can be changed in any mode but the error-mode
-    if(BIOREACTOR_MODE != BIOREACTOR_ERROR_MODE)
-    {
-      // first check if there is a difference between the read value and the stored one
-      if(extractedValueInt != relaySwitchPumpGetAutoSwitchInterval(PUMP_OUT)) 
-      {
-          relaySwitchPumpSetAutoSwitchInterval(PUMP_OUT, extractedValueInt);
-          relaySwitchAutoSwitchMode(PUMP_OUT);
-          if(DEBUG)Serial.println("Pump-OUT value's auto-switching parameter has been changed.");
-        // check if the input value is valid, then save it
-        if(extractedValueInt > 100 && extractedValueInt < 0 )// min. value is 0% max. value is 100%
-        {
-          Serial.print("WARNING: Pump-OUT value's auto-switching parameter is invalid!. ");
-          Serial.println("It has been corrected to fit the min. [0] and max. [100] allowed values.");
-        }
-      }
-      else if(DEBUG)Serial.println("Pump-OUT value's auto-switching parameter is the same as the saved one.");
-    }
-    else if(DEBUG) Serial.println("WARNING: In ERROR-MODE: Pump-OUT value has not been switched to auto-switching mode");
-    
-    
+  {
+
   } 
-  
   else if (strcmp(fieldName,"mode")==0) {
     // first check if there is a difference between the read value and the stored one
     // then check if in pumping mode; ONLY change from pumping mode if MANUAL mode is selected
@@ -661,59 +620,59 @@ void ethernetParseCommandValue(char *fieldName, double extractedValueFloat)
     else if(DEBUG)Serial.println("The Bioreactor state is the same as the saved one.");
 
   } 
-//  else if (strcmp(fieldName,"pumpOut")==0) {
-//    //---------Set pumpOut state ----------
-//    // only get the pump's state if in MANUAL mode
-//    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-//    {
-//
-//
-//      // first check if there is a difference between the read value and the stored one
-//      if(extractedValueInt != relaySwitchPumpOutGetState())
-//      {
-//        // check if the input value is valid, then save it
-//        if(extractedValueInt == 1 || extractedValueInt == 0 )
-//        {
-//          //turn ON or OFF
-//          if(extractedValueInt == 1) relaySwitchPumpOutTurnOn();
-//          else relaySwitchPumpOutTurnOff(); // if extractedValueInt = 0
-//          if(DEBUG)Serial.println("PumpOut has been set to a new state.");
-//        }
-//        else
-//        {
-//          if(DEBUG)Serial.println("WARNING: PumpOut state is invalid!.");
-//        }
-//      }
-//      else if(DEBUG)Serial.println("PumpOut state is the same as the saved one.");
-//    }
-//    else if(DEBUG) Serial.println("Not in MANUAL mode: PumpOut's value not taken");
-//  } 
-//  else if (strcmp(fieldName,"pumpIn")==0) {
-//
-//    //---------Set pumpIn state ----------
-//    // only get the pump's state if in MANUAL mode
-//    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
-//    {
-//      // first check if there is a difference between the read value and the stored one
-//      if(extractedValueInt != relaySwitchPumpInGetState())
-//      {
-//        // check if the input value is valid, then save it
-//        if(extractedValueInt == 1 || extractedValueInt == 0 )
-//        {
-//          //turn ON or OFF
-//          if(extractedValueInt == 1) relaySwitchPumpInTurnOn();
-//          else relaySwitchPumpInTurnOff(); // if extractedValueInt = 0
-//          if(DEBUG)Serial.println("PumpIn has been set to a new state.");
-//        }
-//        else
-//        {
-//          if(DEBUG)Serial.println("WARNING: PumpIn state is invalid!.");
-//        }
-//      }
-//      else if(DEBUG)Serial.println("PumpIn state is the same as the saved one.");
-//    }
-//    else if(DEBUG) Serial.println("Not in MANUAL mode: PumpIn's value not taken");
-//  } 
+  else if (strcmp(fieldName,"pumpOut")==0) {
+    //---------Set pumpOut state ----------
+    // only get the pump's state if in MANUAL mode
+    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    {
+
+
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != relaySwitchPumpOutGetState())
+      {
+        // check if the input value is valid, then save it
+        if(extractedValueInt == 1 || extractedValueInt == 0 )
+        {
+          //turn ON or OFF
+          if(extractedValueInt == 1) relaySwitchPumpOutTurnOn();
+          else relaySwitchPumpOutTurnOff(); // if extractedValueInt = 0
+          if(DEBUG)Serial.println("PumpOut has been set to a new state.");
+        }
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: PumpOut state is invalid!.");
+        }
+      }
+      else if(DEBUG)Serial.println("PumpOut state is the same as the saved one.");
+    }
+    else if(DEBUG) Serial.println("Not in MANUAL mode: PumpOut's value not taken");
+  } 
+  else if (strcmp(fieldName,"pumpIn")==0) {
+
+    //---------Set pumpIn state ----------
+    // only get the pump's state if in MANUAL mode
+    if(BIOREACTOR_MODE == BIOREACTOR_MANUAL_MODE)
+    {
+      // first check if there is a difference between the read value and the stored one
+      if(extractedValueInt != relaySwitchPumpInGetState())
+      {
+        // check if the input value is valid, then save it
+        if(extractedValueInt == 1 || extractedValueInt == 0 )
+        {
+          //turn ON or OFF
+          if(extractedValueInt == 1) relaySwitchPumpInTurnOn();
+          else relaySwitchPumpInTurnOff(); // if extractedValueInt = 0
+          if(DEBUG)Serial.println("PumpIn has been set to a new state.");
+        }
+        else
+        {
+          if(DEBUG)Serial.println("WARNING: PumpIn state is invalid!.");
+        }
+      }
+      else if(DEBUG)Serial.println("PumpIn state is the same as the saved one.");
+    }
+    else if(DEBUG) Serial.println("Not in MANUAL mode: PumpIn's value not taken");
+  } 
   else if (strcmp(fieldName,"motor")==0) {
 
     //---------Set motor state ----------
