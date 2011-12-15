@@ -43,7 +43,7 @@
 #define LIQUID_LEVEL_PHYSICAL_MAX 8.6f //in inch
 #define LIQUID_LEVEL_PHYSICAL_MAX_INTERVAL 1023 //Arduino interval from 0 to 1023
 #define LIQUID_LEVEL_PHYSICAL_MIN_INTERVAL 0
-#define PIN_FLOAT_MAX A3 // for the floater
+#define PIN_FLOAT_MAX A3
 #define PIN_FLOAT_MIN A4
 
 //----------CONSTANTS-LOGGING---------  
@@ -74,7 +74,7 @@
 // 818 = 819.2-1; corresponds to 4Volts of maximum output of the pH meter
 
 //----------CONSTANTS-TEMPERATURE---------
-#define PIN_TEMPERATURE_SENSOR_BOTTOM 33 // most closly to the external power supply of the extension board
+#define PIN_TEMPERATURE_SENSOR_BOTTOM 30 // most closly to the external power supply of the extension board
 #define PIN_TEMPERATURE_SENSOR_IN_LIQUID 32 
 #define PIN_TEMPERATURE_SENSOR_AMBIENT 31
 #define TEMPERATURE_MIN_ALLOWED_LIMIT 15 // 15°C is the lowest allowed measured voltage; this Bioreactor is made for Cali, Colombia
@@ -121,6 +121,7 @@ void setup()
   loggingSetup();
   ethernetSetup();
   //sdCardSetup();
+  floatSetup();
 
 
   //setup the global variables
@@ -142,7 +143,7 @@ void setup()
 
   //    //put the Bioreactor in running mode
   BIOREACTOR_MODE = BIOREACTOR_RUNNING_MODE;
-  bioreactorAncientMode = BIOREACTOR_MODE;
+  bioreactorAncientMode = BIOREACTOR_STANDBY_MODE;
 
   Serial.println("The Bioreactor has been set up and is running...\n");
 }
@@ -172,11 +173,12 @@ void loop()
     gasValvesCheck();
     //automatic program
     
-    if(liquidLevelFloatMaxGet() == 0)
+// UNCOMMENTED FOR DEBUGGING PURPOSES    
+    if((floatMaxGet() == 0) && (floatMinGet() == 1))
     { 
       // ask two times, to avoid artefacts (measurement errors)
       globalUpdateSensors();
-      if(liquidLevelFloatMaxGet()== 0) 
+      if((floatMaxGet()== 0) && (floatMinGet() == 1)) 
       { 
         BIOREACTOR_MODE = BIOREACTOR_PUMPING_MODE;  
       } 
@@ -188,11 +190,11 @@ void loop()
     //wait for for a predefined amount of minutes  
     //and turn on the perilstaltic pump on until a predefined liquid level has been reached    
     timerPumpingOut.check();
-    if(liquidLevelFloatMinGet() == 0)
+    if((floatMaxGet()== 1) && (floatMinGet() == 0))
     {  
       // ask two times, to avoid artefacts (measurement errors)
       globalUpdateSensors();
-      if(liquidLevelFloatMinGet() == 0)
+      if((floatMaxGet()== 1) && (floatMinGet() == 0))
       {  
         BIOREACTOR_MODE = BIOREACTOR_RUNNING_MODE;
         timerPumpingOut.disable();      
